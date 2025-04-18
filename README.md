@@ -55,7 +55,7 @@ To run the application, open two terminal windows and execute the following comm
 
 - Navigate to the client directory: `cd client`
 - Serve the client files: `serve`
-- The client will be available at `http://localhost:5000` (default port for `serve`). Open this URL in your web browser to access the application.
+- The client will be available at a dynamically assigned port, which will be displayed in the terminal output (e.g., `http://localhost:<port>`). Open the provided URL in your web browser to access the application.
 
 ## Usage
 
