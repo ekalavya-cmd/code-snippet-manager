@@ -1,7 +1,7 @@
 Code Snippet Manager
 The Code Snippet Manager is a full-stack web application designed to help developers store, manage, and share code snippets efficiently. Built with AngularJS on the client side and Express.js with MongoDB on the server side, this project provides a user-friendly interface to create, edit, search, and organize code snippets by language, category, and tags. It includes features such as user authentication, snippet verification, personal collections, and admin controls.
-Features
 
+Features
 User Authentication: Register and log in with a unique username and @csm.com email, with admin privileges for designated users.
 Snippet Management: Add, edit, and delete snippets with support for multiple programming languages (JavaScript, Python, Java, HTML, CSS, Ruby, PHP, SQL).
 Search Functionality: Filter snippets by title, code, tags, language, and category.
@@ -11,7 +11,6 @@ Code Highlighting: Syntax highlighting powered by Prism.js for better code reada
 Responsive Design: Optimized for both desktop and mobile devices with a modern, gradient-based UI.
 
 Tech Stack
-
 Frontend: AngularJS, HTML, CSS
 Backend: Express.js, Node.js
 Database: MongoDB with Mongoose
@@ -19,23 +18,44 @@ Authentication: JWT, bcrypt
 Other: CORS, dotenv
 
 Installation
-
 Clone the repository: git clone <repository-url>
 Navigate to the project directory: cd code-snippet-manager
-Install server dependencies: npm install in the server directory
-Set up environment variables in a .env file (see .env.example for template)
-Start the server: npm start
-Open index.html in a web browser to access the client side.
+
+Prerequisites
+Node.js and npm installed
+MongoDB running locally (or update MONGO_URI in .env for a remote database)
+Serve package installed globally: npm install -g serve
+
+Setup
+Create a .env file in the server directory with the following variables (see .env.example for a template):
+PORT=3000
+MONGO_URI=mongodb://localhost:27017/snippetDB
+ADMIN_EMAIL=admin@csm.com
+JWT_SECRET=your-secure-jwt-secret
+
+Install server dependencies: cd server && npm install
+Install client dependencies (if any additional packages are needed in client): cd client && npm install
+
+Running the Application
+To run the application, open two terminal windows and execute the following commands:
+
+Terminal 1: Start the Server
+Navigate to the server directory: cd server
+Start the Node.js server: node index.js
+The server will run on http://localhost:3000, and you should see a confirmation message in the terminal.
+
+Terminal 2: Start the Client
+Navigate to the client directory: cd client
+Serve the client files: serve
+The client will be available at http://localhost:5000 (default port for serve). Open this URL in your web browser to access the application.
 
 Usage
-
 Register with a valid @csm.com email to get started.
 Log in to manage your snippets or view the public collection.
 Admins (registered with the admin email) can verify snippets and perform additional administrative tasks.
 
 Contributing
 Contributions are welcome! Please fork the repository and submit pull requests for any enhancements or bug fixes.
+
 License
 This project is licensed under the ISC License.
-
- 
