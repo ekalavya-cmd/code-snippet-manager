@@ -1,0 +1,56 @@
+<div class="card" ng-controller="AuthController">
+  <h1>Register</h1>
+  <div ng-if="errorMessage" class="error-message">{{errorMessage}}</div>
+  <form id="registerForm" ng-submit="register()">
+    <label for="register-email">Email</label>
+    <input
+      id="register-email"
+      ng-model="registerData.email"
+      placeholder="Email"
+      required
+      ng-keydown="onEnter($event, 'register-password')"
+      ng-change="clearErrors()"
+      tabindex="1"
+    />
+    <div ng-if="errors.email" class="field-error">{{errors.email}}</div>
+
+    <label for="register-password">Password</label>
+    <input
+      id="register-password"
+      type="password"
+      ng-model="registerData.password"
+      placeholder="Password"
+      required
+      ng-keydown="onEnter($event, 'register-username')"
+      ng-change="clearErrors()"
+      tabindex="2"
+    />
+    <div ng-if="errors.password" class="field-error">{{errors.password}}</div>
+
+    <label for="register-username">Username</label>
+    <input
+      id="register-username"
+      ng-model="registerData.username"
+      placeholder="Username"
+      required
+      ng-keydown="onEnter($event, null, register)"
+      ng-change="clearErrors()"
+      tabindex="3"
+    />
+    <div ng-if="errors.username" class="field-error">{{errors.username}}</div>
+
+    <button
+      id="register-button"
+      type="submit"
+      class="next-btn"
+      ng-click="register()"
+      tabindex="4"
+    >
+      Next
+    </button>
+    <p>
+      Already have an account?
+      <a href class="no-underline" ng-click="goToLogin()" tabindex="5">Login</a>
+    </p>
+  </form>
+</div>

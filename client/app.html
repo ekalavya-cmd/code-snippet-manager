@@ -1,0 +1,402 @@
+<div class="main-container">
+  <div class="header">
+    <h1>Code Snippet Manager</h1>
+    <button class="logout-btn" ng-click="logout()" aria-label="Logout">
+      Logout
+    </button>
+  </div>
+
+  <!-- Form -->
+  <div class="card" id="edit-snippet-section">
+    <h2>{{editMode ? 'Edit Snippet' : 'Add Snippet'}}</h2>
+    <div ng-if="successMessage" class="success-message">{{successMessage}}</div>
+    <div ng-if="errorMessage" class="error-message">{{errorMessage}}</div>
+    <form
+      id="snippetForm"
+      ng-submit="editMode ? updateSnippet() : saveSnippet()"
+    >
+      <label for="snippet-title">Title</label>
+      <input
+        id="snippet-title"
+        ng-model="newSnippet.title"
+        placeholder="Title"
+        required
+        ng-keydown="onEnter($event, 'snippet-code')"
+        ng-change="clearErrors()"
+        tabindex="1"
+      />
+      <div ng-if="errors.title" class="field-error">{{errors.title}}</div>
+
+      <label for="snippet-code">Code</label>
+      <textarea
+        id="snippet-code"
+        ng-model="newSnippet.code"
+        placeholder="Code"
+        required
+        ng-keydown="onEnter($event, 'snippet-language')"
+        ng-change="clearErrors()"
+        tabindex="2"
+      ></textarea>
+      <div ng-if="errors.code" class="field-error">{{errors.code}}</div>
+
+      <label for="snippet-language">Language</label>
+      <select
+        id="snippet-language"
+        ng-model="newSnippet.language"
+        required
+        ng-keydown="onEnter($event, 'snippet-tags')"
+        ng-change="clearErrors()"
+        tabindex="3"
+      >
+        <option value="">All Languages</option>
+        <option value="javascript">JavaScript</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="ruby">Ruby</option>
+        <option value="php">PHP</option>
+        <option value="sql">SQL</option>
+      </select>
+      <div ng-if="errors.language" class="field-error">{{errors.language}}</div>
+
+      <label for="snippet-tags">Tags</label>
+      <input
+        id="snippet-tags"
+        ng-model="newSnippet.tags"
+        placeholder="Tags (comma-separated)"
+        ng-keydown="onEnter($event, 'snippet-category')"
+        ng-change="clearErrors()"
+        tabindex="4"
+      />
+      <div ng-if="errors.tags" class="field-error">{{errors.tags}}</div>
+
+      <label for="snippet-category">Category</label>
+      <select
+        id="snippet-category"
+        ng-model="newSnippet.category"
+        ng-keydown="onEnter($event, null, editMode ? updateSnippet : saveSnippet)"
+        ng-change="clearErrors()"
+        tabindex="5"
+      >
+        <option value="">All Categories</option>
+        <option value="Frontend">Frontend</option>
+        <option value="Backend">Backend</option>
+        <option value="Utilities">Utilities</option>
+        <option value="Database">Database</option>
+        <option value="Other">Other</option>
+      </select>
+      <div ng-if="errors.category" class="field-error">{{errors.category}}</div>
+
+      <div class="form-buttons">
+        <button
+          type="submit"
+          class="next-btn"
+          ng-click="saveSnippet()"
+          ng-show="!editMode"
+          aria-label="Add Snippet"
+          tabindex="6"
+        >
+          Add Snippet
+        </button>
+        <button
+          type="submit"
+          class="next-btn"
+          ng-click="updateSnippet()"
+          ng-show="editMode"
+          aria-label="Update Snippet"
+          tabindex="6"
+        >
+          Update Snippet
+        </button>
+        <button
+          class="cancel-btn"
+          ng-click="clearForm()"
+          ng-show="editMode"
+          aria-label="Cancel"
+          tabindex="7"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search for All Snippets -->
+  <div ng-show="!showCollection" class="card">
+    <h2>Search</h2>
+    <div class="search-container">
+      <label for="search-all-snippets">Search by Title, Code, or Tags</label>
+      <input
+        id="search-all-snippets"
+        ng-model="searchQuery"
+        ng-change="searchSnippets()"
+        placeholder="Search by title, code, or tags"
+        class="search-input search-input-wide"
+        aria-label="Search all snippets"
+      />
+      <label for="search-language-all">Language</label>
+      <select
+        id="search-language-all"
+        ng-model="searchLanguage"
+        ng-change="searchSnippets()"
+        class="search-filter search-filter-compact"
+        aria-label="Filter by language"
+      >
+        <option value="">All Languages</option>
+        <option value="javascript">JavaScript</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="ruby">Ruby</option>
+        <option value="php">PHP</option>
+        <option value="sql">SQL</option>
+      </select>
+      <label for="search-category-all">Category</label>
+      <select
+        id="search-category-all"
+        ng-model="searchCategory"
+        ng-change="searchSnippets()"
+        class="search-filter search-filter-compact"
+        aria-label="Filter by category"
+      >
+        <option value="">All Categories</option>
+        <option value="Frontend">Frontend</option>
+        <option value="Backend">Backend</option>
+        <option value="Database">Database</option>
+        <option value="Utilities">Utilities</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <button
+      class="next-btn"
+      ng-click="viewCollection()"
+      aria-label="View My Collection"
+    >
+      View My Collection
+    </button>
+  </div>
+
+  <!-- All Snippets -->
+  <div ng-show="!showCollection">
+    <h2>All Snippets</h2>
+    <div
+      ng-repeat="snippet in filteredSnippets track by snippet._id"
+      class="card snippet"
+    >
+      <h3>{{snippet.title}}</h3>
+      <div
+        class="verification-flag"
+        ng-class="{'not-verified': !snippet.verified, 'verified': snippet.verified}"
+      >
+        {{snippet.verified ? 'Verified' : 'Not Verified'}}
+      </div>
+      <p><strong>Language:</strong> {{snippet.language | capitalize}}</p>
+      <pre><code class="language-{{snippet.language}}">{{snippet.code}}</code></pre>
+      <p><strong>Category:</strong> {{snippet.category}}</p>
+      <p>
+        <strong>Tags:</strong> {{snippet.tags ? snippet.tags.join(', ') : ''}}
+      </p>
+
+      <div class="snippet-buttons">
+        <!-- All Snippets: Edit Button -->
+        <button
+          class="action-btn"
+          ng-class="{ 'not-editable-btn': snippet.verified && !isAdmin }"
+          ng-click="editSnippet(snippet)"
+          ng-disabled="snippet.verified && !isAdmin"
+          aria-label="{{ snippet.verified && !isAdmin ? 'Snippet not editable' : 'Edit snippet' }}"
+        >
+          {{ snippet.verified && !isAdmin ? 'Not Editable' : 'Edit' }}
+        </button>
+        <button
+          class="action-btn delete-btn"
+          ng-class="{ 'deleted-btn': deletedSnippets[snippet._id] }"
+          ng-click="deleteSnippet(snippet._id)"
+          ng-if="isAdmin"
+          aria-label="Delete snippet"
+        >
+          {{ deletedSnippets[snippet._id] ? 'Deleted' : 'Delete' }}
+        </button>
+        <button
+          class="action-btn"
+          ng-class="{ 'copied-btn': copiedSnippets[snippet._id] }"
+          ng-click="copySnippet(snippet, $event)"
+          aria-label="Copy snippet code"
+        >
+          {{ copiedSnippets[snippet._id] ? 'Copied' : 'Copy' }}
+        </button>
+        <button
+          class="action-btn"
+          ng-click="addToCollection(snippet._id)"
+          ng-if="!collectionSnippetIds.has(snippet._id)"
+          aria-label="Add to collection"
+        >
+          Add to Collection
+        </button>
+        <button
+          class="action-btn added-btn"
+          ng-if="collectionSnippetIds.has(snippet._id)"
+          disabled
+          aria-label="Snippet already added to collection"
+        >
+          Added
+        </button>
+        <!-- Report buttons only for admin -->
+        <button
+          class="action-btn report-btn"
+          ng-if="isAdmin && !snippet.verified"
+          ng-click="verifySnippet(snippet._id)"
+          aria-label="Report snippet as valid"
+        >
+          Report Valid
+        </button>
+        <button
+          class="action-btn report-invalid-btn"
+          ng-if="isAdmin && snippet.verified"
+          ng-click="reportInvalid(snippet._id)"
+          aria-label="Report snippet as invalid"
+        >
+          Report Invalid
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- User's Collection -->
+  <div ng-show="showCollection">
+    <!-- Search for My Collection -->
+    <div class="card">
+      <h2>Search</h2>
+      <div class="search-container">
+        <label for="search-my-collection">Search by Title, Code, or Tags</label>
+        <input
+          id="search-my-collection"
+          ng-model="collectionSearchQuery"
+          ng-change="searchCollectionSnippets()"
+          placeholder="Search by title, code, or tags"
+          class="search-input search-input-wide"
+          aria-label="Search my collection"
+        />
+        <label for="search-language-collection">Language</label>
+        <select
+          id="search-language-collection"
+          ng-model="collectionSearchLanguage"
+          ng-change="searchCollectionSnippets()"
+          class="search-filter search-filter-compact"
+          aria-label="Filter collection by language"
+        >
+          <option value="">All Languages</option>
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="java">Java</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="ruby">Ruby</option>
+          <option value="php">PHP</option>
+          <option value="sql">SQL</option>
+        </select>
+        <label for="search-category-collection">Category</label>
+        <select
+          id="search-category-collection"
+          ng-model="collectionSearchCategory"
+          ng-change="searchCollectionSnippets()"
+          class="search-filter search-filter-compact"
+          aria-label="Filter collection by category"
+        >
+          <option value="">All Categories</option>
+          <option value="Frontend">Frontend</option>
+          <option value="Backend">Backend</option>
+          <option value="Database">Database</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button
+        class="next-btn"
+        ng-click="showCollection = false"
+        aria-label="Back to all snippets"
+      >
+        Back to All Snippets
+      </button>
+    </div>
+
+    <h2>My Collection</h2>
+    <div ng-if="filteredCollectionSnippets.length === 0">
+      <p>No snippets in your collection.</p>
+    </div>
+    <div
+      ng-repeat="snippet in filteredCollectionSnippets track by snippet._id"
+      class="card snippet"
+    >
+      <h3>{{snippet.title}}</h3>
+      <div
+        class="verification-flag"
+        ng-class="{'not-verified': !snippet.verified, 'verified': snippet.verified}"
+      >
+        {{snippet.verified ? 'Verified' : 'Not Verified'}}
+      </div>
+      <p><strong>Language:</strong> {{snippet.language | capitalize}}</p>
+      <pre><code class="language-{{snippet.language}}">{{snippet.code}}</code></pre>
+      <p><strong>Category:</strong> {{snippet.category}}</p>
+      <p>
+        <strong>Tags:</strong> {{snippet.tags ? snippet.tags.join(', ') : ''}}
+      </p>
+      <div class="snippet-buttons">
+        <!-- My Collection: Edit Button -->
+        <button
+          class="action-btn"
+          ng-class="{ 'not-editable-btn': snippet.verified && !isAdmin }"
+          ng-click="editSnippet(snippet)"
+          ng-disabled="snippet.verified && !isAdmin"
+          aria-label="{{ snippet.verified && !isAdmin ? 'Snippet not editable' : 'Edit snippet' }}"
+        >
+          {{ snippet.verified && !isAdmin ? 'Not Editable' : 'Edit' }}
+        </button>
+        <button
+          class="action-btn delete-btn"
+          ng-class="{ 'deleted-btn': deletedSnippets[snippet._id] }"
+          ng-click="deleteSnippet(snippet._id)"
+          ng-if="isAdmin"
+          aria-label="Delete snippet"
+        >
+          {{ deletedSnippets[snippet._id] ? 'Deleted' : 'Delete' }}
+        </button>
+        <button
+          class="action-btn delete-btn"
+          ng-class="{ 'removed-btn': removedSnippets[snippet._id] }"
+          ng-click="removeFromCollection(snippet._id)"
+          aria-label="Remove from collection"
+        >
+          {{ removedSnippets[snippet._id] ? 'Removed' : 'Remove from Collection'
+          }}
+        </button>
+        <button
+          class="action-btn"
+          ng-class="{ 'copied-btn': copiedSnippets[snippet._id] }"
+          ng-click="copySnippet(snippet, $event)"
+          aria-label="Copy snippet code"
+        >
+          {{ copiedSnippets[snippet._id] ? 'Copied' : 'Copy' }}
+        </button>
+        <!-- Report buttons only for admin -->
+        <button
+          class="action-btn report-btn"
+          ng-if="isAdmin && !snippet.verified"
+          ng-click="verifySnippet(snippet._id)"
+          aria-label="Report snippet as valid"
+        >
+          Report Valid
+        </button>
+        <button
+          class="action-btn report-invalid-btn"
+          ng-if="isAdmin && snippet.verified"
+          ng-click="reportInvalid(snippet._id)"
+          aria-label="Report snippet as invalid"
+        >
+          Report Invalid
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

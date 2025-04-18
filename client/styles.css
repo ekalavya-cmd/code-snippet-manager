@@ -1,0 +1,548 @@
+/* General Body Styling */
+body {
+  font-family: "Poppins", Arial, sans-serif; /* Modern font */
+  background: linear-gradient(
+    135deg,
+    #e0eafc,
+    #cfdef3
+  ); /* Subtle gradient background */
+  margin: 0;
+  padding: 30px;
+  color: #2d3436;
+  min-height: 100vh;
+}
+
+/* Headings */
+h1,
+h2,
+h3 {
+  color: #2d3436;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  background: linear-gradient(to right, #6f42c1, #00b7eb); /* Gradient text */
+  -webkit-background-clip: text; /* Vendor prefix for older browsers */
+  background-clip: text; /* Standard property for modern browsers */
+  -webkit-text-fill-color: transparent; /* Vendor prefix for older browsers */
+  color: transparent; /* Fallback for browsers that don't support text-fill-color */
+}
+
+h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(to right, #6f42c1, #00b7eb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+h3 {
+  font-size: 1.4rem;
+  background: linear-gradient(to right, #6f42c1, #00b7eb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Card Styling */
+.card {
+  background: #ffffff;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    to right,
+    #6f42c1,
+    #00b7eb
+  ); /* Gradient top border */
+}
+
+/* Snippet Card Specific Styling */
+.snippet {
+  position: relative;
+  padding-top: 50px;
+  border-left: 4px solid #6f42c1; /* Accent border on the left */
+}
+
+/* Form Labels */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #4b5eaa;
+  font-size: 1rem;
+}
+
+/* Form Inputs */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 2px solid #dfe6e9;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 8px rgba(111, 66, 193, 0.3);
+  background-color: #fff;
+}
+
+textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+/* Buttons */
+button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: left 0.3s ease;
+}
+
+button:hover::after {
+  left: 100%;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Specific Button Styles */
+.next-btn {
+  background: linear-gradient(45deg, #6f42c1, #00b7eb);
+  color: #fff;
+}
+
+.next-btn:hover {
+  background: linear-gradient(45deg, #5a32a3, #0097c7);
+}
+
+.cancel-btn {
+  background: linear-gradient(45deg, #6c757d, #adb5bd);
+  color: #fff;
+  margin-left: 15px;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(45deg, #5a6268, #959ca3);
+}
+
+.action-btn {
+  background: linear-gradient(45deg, #28a745, #2ecc71);
+  color: #fff;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.action-btn:hover {
+  background: linear-gradient(45deg, #218838, #27ae60);
+}
+
+.added-btn {
+  background: linear-gradient(45deg, #6c757d, #adb5bd);
+  color: #fff;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.delete-btn {
+  background: linear-gradient(45deg, #dc3545, #ff6b6b);
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(45deg, #c82333, #e04f5f);
+}
+
+.report-btn {
+  background: linear-gradient(45deg, #17a2b8, #48dbfb);
+  color: #fff;
+}
+
+.report-btn:hover {
+  background: linear-gradient(45deg, #138496, #3abde6);
+}
+
+.report-invalid-btn {
+  background: linear-gradient(45deg, #ffc107, #ffda6a);
+  color: #212529;
+}
+
+.report-invalid-btn:hover {
+  background: linear-gradient(45deg, #e0a800, #f7c948);
+}
+
+.logout-btn {
+  background: linear-gradient(45deg, #dc3545, #ff6b6b);
+  color: #fff;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+}
+
+.logout-btn:hover {
+  background: linear-gradient(45deg, #c82333, #e04f5f);
+}
+
+/* Verification Flags */
+.verification-flag {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.not-verified {
+  background: linear-gradient(45deg, #ffc107, #ffda6a);
+  color: #212529;
+}
+
+.verified {
+  background: linear-gradient(45deg, #28a745, #2ecc71);
+  color: #fff;
+}
+
+/* Code Block Styling */
+pre {
+  background: #272822;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #f8f8f2;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Prism.js Code Styling */
+pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  font-family: "Fira Code", "Courier New", Courier, monospace;
+  color: #dfe6e9 !important;
+}
+
+/* Snippet Buttons */
+.snippet-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+/* Prism.js Tokens */
+.token.keyword {
+  color: #ff79c6 !important; /* Pink for keywords (e.g., const, def, class) */
+}
+
+.token.function {
+  color: #50fa7b !important; /* Green for functions (e.g., filter, print) */
+}
+
+.token.string {
+  color: #c678dd !important; /* Vibrant purple for strings */
+}
+
+.token.comment {
+  color: #6272a4 !important; /* Muted blue for comments */
+}
+
+.token.number {
+  color: #f1fa8c !important; /* Yellow for numbers (e.g., 25, 30) */
+}
+
+.token.operator {
+  color: #ff5555 !important; /* Red for operators (e.g., =>, =) */
+}
+
+.token.punctuation {
+  color: #f8f8f2 !important; /* Light gray for punctuation (e.g., {}, ;, ,) */
+}
+
+.token.builtin {
+  color: #50fa7b !important; /* Same green as functions for built-ins (e.g., print, System) */
+}
+
+.token.class-name {
+  color: #8be9fd !important; /* Cyan for class names (e.g., in Java, Ruby) */
+}
+
+.token.variable {
+  color: #bd93f9 !important; /* Light purple for variables (e.g., in SQL, PHP) */
+}
+
+.token.regex {
+  color: #ffb86c !important; /* Orange for regular expressions (e.g., in Ruby, PHP) */
+}
+
+.token.annotation {
+  color: #ff79c6 !important; /* Same pink as keywords for annotations (e.g., @Override in Java) */
+}
+
+.form-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Header Styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #dfe6e9;
+}
+
+/* Links */
+.snippet a,
+.auth-link,
+a {
+  color: #6f42c1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.auth-link {
+  cursor: pointer;
+}
+
+.snippet a:hover,
+.auth-link:hover,
+.no-underline:hover {
+  color: #5a32a3;
+}
+
+/* Snippet Details Spacing */
+.snippet p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #4b5eaa;
+}
+
+/* Add a subtle animation to snippets */
+.snippet {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+
+  .card {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .snippet-buttons {
+    gap: 8px;
+  }
+
+  .logout-btn {
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+  }
+}
+/* Error Messages */
+.error-message {
+  color: #dc3545;
+  background: #f8d7da;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  border: 1px solid #f5c6cb;
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.copied-btn {
+  background-color: #28a745 !important;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.action-btn {
+  transition: all 0.3s ease;
+}
+
+.success-message {
+  color: #155724;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  border: 1px solid #c3e6cb;
+}
+
+.removed-btn {
+  background: linear-gradient(45deg, #dc3545, #ff6b6b) !important;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.deleted-btn {
+  background: linear-gradient(45deg, #dc3545, #ff6b6b) !important;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.not-editable-btn {
+  background: linear-gradient(45deg, #6c757d, #adb5bd);
+  color: #fff;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.search-container label {
+  font-size: 14px;
+  color: #333;
+  margin-right: 5px;
+}
+
+.search-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.search-input-wide {
+  flex: 2; /* Make the input take up more space */
+  min-width: 300px; /* Ensure a minimum width for usability */
+}
+
+.search-filter {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.search-filter-compact {
+  width: 150px; /* Reduce the width of the dropdowns */
+}
+
+.search-filter:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Ensure the button below the search container is styled appropriately */
+.next-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.next-btn:hover {
+  background-color: #0056b3;
+}

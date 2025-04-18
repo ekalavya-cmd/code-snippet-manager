@@ -1,0 +1,47 @@
+<div class="card" ng-controller="AuthController">
+  <h1>Login</h1>
+  <div ng-if="errorMessage" class="error-message">{{errorMessage}}</div>
+  <form id="loginForm" ng-submit="login()">
+    <label for="login-email">Email or Username</label>
+    <input
+      id="login-email"
+      ng-model="loginData.email"
+      placeholder="Email or Username"
+      required
+      ng-keydown="onEnter($event, 'login-password')"
+      ng-change="clearErrors()"
+      tabindex="1"
+    />
+    <div ng-if="errors.email" class="field-error">{{errors.email}}</div>
+
+    <label for="login-password">Password</label>
+    <input
+      id="login-password"
+      type="password"
+      ng-model="loginData.password"
+      placeholder="Password"
+      required
+      ng-keydown="onEnter($event, null, login)"
+      ng-change="clearErrors()"
+      tabindex="2"
+    />
+    <div ng-if="errors.password" class="field-error">{{errors.password}}</div>
+
+    <button
+      id="login-button"
+      type="submit"
+      class="next-btn"
+      ng-click="login()"
+      aria-label="Login"
+      tabindex="3"
+    >
+      Next
+    </button>
+    <p>
+      New to CSM?
+      <a class="auth-link" ng-click="goToRegister()" tabindex="4"
+        >Create an account</a
+      >
+    </p>
+  </form>
+</div>
