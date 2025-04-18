@@ -62,6 +62,11 @@ To run the application, open two terminal windows and execute the following comm
 - Register with a valid @csm.com email to get started.
 - Log in to manage your snippets or view the public collection.
 - Admins (registered with the admin email) can verify snippets and perform additional administrative tasks.
+- Use the search functionality to quickly find snippets by entering keywords, selecting a language, or choosing a category.
+- Add frequently used snippets to your personal collection for quick access and remove them when no longer needed.
+- Edit your own snippets or, as an admin, modify verified snippets to maintain quality and accuracy.
+- Copy snippet code to your clipboard with a single click for easy reuse in your projects.
+- Explore the responsive design by accessing the application on various devices, ensuring a seamless experience.
 
 ## Contributing
 
