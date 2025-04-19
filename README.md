@@ -59,14 +59,14 @@ To run the application, open two terminal windows and execute the following comm
 
 ## Usage
 
--   Getting Started: Register with a valid @csm.com email to create an account; log in to unlock features, with admin privileges for the designated email.
--   Managing Snippets: Create snippets with title, code, language, tags, and category; edit or delete your own, with admins managing all snippets.
--   Searching and Filtering: Search by keywords in titles, code, or tags; refine with language and category dropdowns for quick results.
--   Personal Collections: Add snippets to your collection with one click; remove them and manage your curated set in the collection view.
--   Verification Process: Admins verify snippets for trust or report as invalid; ensures high-quality, reliable code examples.
--   Code Reuse: Copy snippet code to clipboard instantly; perfect for seamless integration into your projects.
--   Cross-Device Experience: Access the app on desktops or smartphones; enjoy a consistent, responsive interface anywhere.
--   Navigation and Efficiency: Switch between all snippets and your collection; use "Enter" to navigate forms or submit for a smooth workflow.
+-   **Getting Started:** Register with a valid @csm.com email to create an account; log in to unlock features, with admin privileges for the designated email.
+-   **Managing Snippets:** Create snippets with title, code, language, tags, and category; edit or delete your own, with admins managing all snippets.
+-   **Searching and Filtering:** Search by keywords in titles, code, or tags; refine with language and category dropdowns for quick results.
+-   **Personal Collections:** Add snippets to your collection with one click; remove them and manage your curated set in the collection view.
+-   **Verification Process:** Admins verify snippets for trust or report as invalid; ensures high-quality, reliable code examples.
+-   **Code Reuse:** Copy snippet code to clipboard instantly; perfect for seamless integration into your projects.
+-   **Cross-Device Experience:** Access the app on desktops or smartphones; enjoy a consistent, responsive interface anywhere.
+-   **Navigation and Efficiency:** Switch between all snippets and your collection; use "Enter" to navigate forms or submit for a smooth workflow.
 
 ## Contributing
 
