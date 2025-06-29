@@ -131,7 +131,7 @@ serve
    │   Serving!                                      │
    │                                                 │
    │   - Local:            http://localhost:3000     │
-   │   - On Your Network:  http://192.168.1.x:3000  │
+   │   - On Your Network:  http://192.168.1.x:3000   │
    │                                                 │
    │   Copied local address to clipboard!            │
    │                                                 │
