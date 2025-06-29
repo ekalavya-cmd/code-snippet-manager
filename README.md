@@ -62,23 +62,19 @@ code-snippet-manager/
 ### Setup Instructions
 
 1. **Clone the repository**
-
    ```bash
    git clone https://github.com/ekalavya-cmd/code-snippet-manager.git
    cd code-snippet-manager
    ```
 
 2. **Install global dependencies**
-
    ```bash
    npm install -g serve
    ```
 
 3. **Configure environment variables**
-
    - Navigate to the `server` directory
    - Update the `.env` file with your configuration:
-
    ```env
    PORT=3000
    MONGO_URI=mongodb://localhost:27017/snippetDB
@@ -87,7 +83,6 @@ code-snippet-manager/
    ```
 
 4. **Install server dependencies**
-
    ```bash
    cd server
    npm install
@@ -109,7 +104,6 @@ node index.js
 ```
 
 **Expected output:**
-
 ```
 Server running on port 3000
 Successfully connected to MongoDB
@@ -124,7 +118,6 @@ serve
 ```
 
 **Expected output:**
-
 ```
    ┌─────────────────────────────────────────────────┐
    │                                                 │
@@ -145,39 +138,33 @@ Open the provided URL in your web browser to access the application.
 ## Usage
 
 ### Getting Started
-
 - **Registration**: Create an account with a valid @csm.com email address
 - **Admin Access**: The email specified in `ADMIN_EMAIL` environment variable gets admin privileges automatically
 - **Login**: Sign in with your email/username and password
 
 ### Managing Snippets
-
 - **Create**: Add new snippets with title, code, language, tags, and category
 - **Edit**: Modify your own snippets (admins can edit any snippet)
 - **Delete**: Only admins can delete snippets
 - **Verification**: Admins can mark snippets as verified or invalid
 
 ### Search and Filter
-
 - **Text Search**: Search by keywords in titles, code, or tags
 - **Language Filter**: Filter by programming language
 - **Category Filter**: Filter by snippet category
 - **Real-time Results**: Search results update as you type
 
 ### Personal Collections
-
 - **Add to Collection**: Save useful snippets to your personal collection
 - **Manage Collection**: View and organize your saved snippets
 - **Remove from Collection**: Remove snippets you no longer need
 
 ### Code Features
-
 - **Syntax Highlighting**: Automatic code highlighting based on language
 - **Copy to Clipboard**: One-click code copying functionality
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ### Admin Features
-
 - **Snippet Verification**: Mark snippets as verified for quality assurance
 - **Snippet Management**: Edit and delete any snippet
 - **User Management**: Full control over all user-generated content
@@ -185,27 +172,24 @@ Open the provided URL in your web browser to access the application.
 ## Development Features
 
 ### Logging System
-
 The application includes a comprehensive logging system for development:
 
 - **Browser Logs**: All application activities are logged in the browser console
 - **Local Storage**: Logs are automatically saved to browser's localStorage
 - **Export Functionality**: Export logs as text files for analysis
 - **Debug Functions**: Access logging functions through browser console:
-
   ```javascript
   // View all logs in a table format
-  viewSnippetLogs();
-
+  viewSnippetLogs()
+  
   // Export logs as a downloadable file
-  exportSnippetLogs();
-
+  exportSnippetLogs()
+  
   // Clear all stored logs
-  clearSnippetLogs();
+  clearSnippetLogs()
   ```
 
 ### Debugging
-
 - **Console Logging**: Detailed logs for all operations
 - **Error Handling**: Comprehensive error catching and reporting
 - **Network Monitoring**: Track API requests and responses
@@ -214,12 +198,10 @@ The application includes a comprehensive logging system for development:
 ## API Endpoints
 
 ### Authentication
-
 - `POST /register` - Register a new user
 - `POST /login` - Login user and get JWT token
 
 ### Snippets
-
 - `GET /snippets` - Get all snippets
 - `POST /snippets` - Create a new snippet
 - `PUT /snippets/:id` - Update a snippet
@@ -227,12 +209,10 @@ The application includes a comprehensive logging system for development:
 - `GET /snippets/search` - Search snippets with filters
 
 ### Verification (Admin only)
-
 - `PUT /snippets/:id/verify` - Mark snippet as verified
 - `PUT /snippets/:id/report-invalid` - Mark snippet as invalid
 
 ### Collections
-
 - `POST /collection` - Add snippet to personal collection
 - `GET /collection` - Get user's collection
 - `DELETE /collection/:snippetId` - Remove snippet from collection
@@ -253,18 +233,15 @@ JWT_SECRET=your-secure-jwt-secret-here       # JWT signing secret
 ### Common Issues
 
 1. **Port Already in Use**
-
    - Server: Change `PORT` in `.env` file
    - Client: The `serve` command will automatically use the next available port
 
 2. **MongoDB Connection Failed**
-
    - Ensure MongoDB is running locally
    - Check the `MONGO_URI` in your `.env` file
    - For MongoDB Atlas, verify your connection string and network access
 
 3. **Cannot Register Admin User**
-
    - Verify `ADMIN_EMAIL` in `.env` matches your registration email exactly
    - Check MongoDB connection and user creation logs
 
