@@ -71,6 +71,18 @@
                   tabindex="2"
                   autocomplete="current-password"
                 />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  ng-click="togglePasswordVisibility('login')"
+                  tabindex="-1"
+                  title="Toggle password visibility"
+                >
+                  <i
+                    class="bi"
+                    ng-class="showLoginPassword ? 'bi-eye-slash' : 'bi-eye'"
+                  ></i>
+                </button>
               </div>
               <div ng-if="errors.password" class="field-error">
                 <i class="bi bi-exclamation-circle me-1"></i>

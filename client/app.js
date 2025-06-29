@@ -89,11 +89,45 @@ angular
     $scope.errorMessage = "";
     $scope.errors = { email: "", password: "", username: "" };
     $scope.successMessage = "";
+    // Password visibility states
+    $scope.showLoginPassword = false;
+    $scope.showRegisterPassword = false;
 
     $scope.clearErrors = function () {
       $scope.errorMessage = "";
       $scope.errors = { email: "", password: "", username: "" };
       logToFile("Form errors cleared", "DEBUG");
+    };
+
+    // Toggle password visibility function
+    $scope.togglePasswordVisibility = function (formType) {
+      if (formType === "login") {
+        $scope.showLoginPassword = !$scope.showLoginPassword;
+        const passwordField = document.getElementById("login-password");
+        if (passwordField) {
+          passwordField.type = $scope.showLoginPassword ? "text" : "password";
+        }
+        logToFile(
+          `Login password visibility toggled: ${
+            $scope.showLoginPassword ? "visible" : "hidden"
+          }`,
+          "DEBUG"
+        );
+      } else if (formType === "register") {
+        $scope.showRegisterPassword = !$scope.showRegisterPassword;
+        const passwordField = document.getElementById("register-password");
+        if (passwordField) {
+          passwordField.type = $scope.showRegisterPassword
+            ? "text"
+            : "password";
+        }
+        logToFile(
+          `Register password visibility toggled: ${
+            $scope.showRegisterPassword ? "visible" : "hidden"
+          }`,
+          "DEBUG"
+        );
+      }
     };
 
     // Replace the existing register function in AuthController with this enhanced version:
@@ -161,6 +195,14 @@ angular
           $scope.successMessage = "Account created successfully! Please login.";
           // Clear form data
           $scope.registerData = { email: "", username: "", password: "" };
+          $scope.showRegisterPassword = false;
+
+          // Reset password field type
+          const passwordField = document.getElementById("register-password");
+          if (passwordField) {
+            passwordField.type = "password";
+          }
+
           // Auto-redirect to login after 2 seconds
           setTimeout(() => {
             $location.path("/login");
@@ -217,6 +259,17 @@ angular
           const payload = JSON.parse(atob(token.split(".")[1]));
           localStorage.setItem("role", payload.role);
           logToFile(`User role set to: ${payload.role}`, "INFO");
+
+          // Clear form data and reset password visibility
+          $scope.loginData = { email: "", password: "" };
+          $scope.showLoginPassword = false;
+
+          // Reset password field type
+          const passwordField = document.getElementById("login-password");
+          if (passwordField) {
+            passwordField.type = "password";
+          }
+
           $location.path("/app");
         })
         .catch((err) => {
@@ -232,6 +285,13 @@ angular
     $scope.goToLogin = function () {
       logToFile("Navigating to login page", "INFO");
       $scope.clearErrors(); // Clear any existing errors
+      $scope.showRegisterPassword = false; // Reset register password visibility
+      // Reset register password field type if it exists
+      const registerPasswordField =
+        document.getElementById("register-password");
+      if (registerPasswordField) {
+        registerPasswordField.type = "password";
+      }
       $location.path("/login");
       if (!$scope.$$phase) {
         $scope.$apply();
@@ -241,6 +301,12 @@ angular
     $scope.goToRegister = function () {
       logToFile("Navigating to register page", "INFO");
       $scope.clearErrors(); // Clear any existing errors
+      $scope.showLoginPassword = false; // Reset login password visibility
+      // Reset login password field type if it exists
+      const loginPasswordField = document.getElementById("login-password");
+      if (loginPasswordField) {
+        loginPasswordField.type = "password";
+      }
       $location.path("/register");
       if (!$scope.$$phase) {
         $scope.$apply();

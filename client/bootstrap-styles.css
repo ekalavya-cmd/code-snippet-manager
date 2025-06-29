@@ -565,6 +565,26 @@ body {
   min-width: fit-content;
 }
 
+/* Make Language and Category badges match tag styling */
+.snippet-meta .badge {
+  background: linear-gradient(45deg, #e9ecef, #f8f9fa) !important;
+  color: #495057 !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 20px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
+}
+
+/* Override Bootstrap's default badge colors */
+.snippet-meta .badge.bg-light,
+.snippet-meta .badge.text-dark {
+  background: linear-gradient(45deg, #e9ecef, #f8f9fa) !important;
+  color: #495057 !important;
+}
+
 /* Tag Styling - Updated for inline display */
 .tag-list {
   display: inline-flex; /* Changed from flex to inline-flex for inline layout */
@@ -623,8 +643,9 @@ body {
     gap: 0.75rem !important;
   }
 
-  .tag-item {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
+  .tag-item,
+  .snippet-meta .badge {
+    font-size: 0.75rem !important;
+    padding: 0.2rem 0.6rem !important;
   }
 }

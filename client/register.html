@@ -71,19 +71,33 @@
                 <i class="bi bi-lock-fill me-1"></i>
                 Password
               </label>
-              <input
-                id="register-password"
-                type="password"
-                class="form-control"
-                ng-class="{'is-invalid': errors.password}"
-                ng-model="registerData.password"
-                placeholder="Create a secure password"
-                required
-                ng-keydown="onEnter($event, 'register-username')"
-                ng-change="clearErrors()"
-                tabindex="2"
-                autocomplete="new-password"
-              />
+              <div class="input-group">
+                <input
+                  id="register-password"
+                  type="password"
+                  class="form-control"
+                  ng-class="{'is-invalid': errors.password}"
+                  ng-model="registerData.password"
+                  placeholder="Create a secure password"
+                  required
+                  ng-keydown="onEnter($event, 'register-username')"
+                  ng-change="clearErrors()"
+                  tabindex="2"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  ng-click="togglePasswordVisibility('register')"
+                  tabindex="-1"
+                  title="Toggle password visibility"
+                >
+                  <i
+                    class="bi"
+                    ng-class="showRegisterPassword ? 'bi-eye-slash' : 'bi-eye'"
+                  ></i>
+                </button>
+              </div>
 
               <!-- Password Strength Indicator -->
               <div ng-if="registerData.password" class="password-strength mt-2">
