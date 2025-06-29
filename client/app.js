@@ -1,3 +1,47 @@
+// Logging functionality for development
+function logToFile(message, level = "INFO") {
+  const timestamp = new Date().toISOString();
+  const logEntry = `[${timestamp}] ${level}: ${message}`;
+
+  // Store in localStorage for development (accessible in VS Code via browser dev tools)
+  try {
+    const logs = JSON.parse(localStorage.getItem("snippetManagerLogs") || "[]");
+    logs.push(logEntry);
+    // Keep last 200 logs to prevent localStorage overflow
+    const recentLogs = logs.slice(-200);
+    localStorage.setItem("snippetManagerLogs", JSON.stringify(recentLogs));
+
+    // Also log to console for VS Code terminal visibility
+    console.log(`📝 ${logEntry}`);
+
+    // For debugging: you can view all logs by running this in browser console:
+    // console.table(JSON.parse(localStorage.getItem('snippetManagerLogs')))
+  } catch (error) {
+    console.error("Failed to write log:", error);
+  }
+}
+
+// Export logs function for debugging
+function exportLogs() {
+  const logs = JSON.parse(localStorage.getItem("snippetManagerLogs") || "[]");
+  const logText = logs.join("\n");
+  const blob = new Blob([logText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `snippet_manager_logs_${
+    new Date().toISOString().split("T")[0]
+  }.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Clear logs function
+function clearLogs() {
+  localStorage.removeItem("snippetManagerLogs");
+  logToFile("Logs cleared by user", "INFO");
+}
+
 angular
   .module("SnippetApp", ["ngRoute"])
   .filter("capitalize", function () {
@@ -17,6 +61,7 @@ angular
     };
   })
   .config(function ($routeProvider) {
+    logToFile("Application configuration started", "INFO");
     $routeProvider
       .when("/login", {
         templateUrl: "login.html",
@@ -33,8 +78,11 @@ angular
       .otherwise({
         redirectTo: "/login",
       });
+    logToFile("Application routes configured successfully", "INFO");
   })
   .controller("AuthController", function ($scope, $http, $location) {
+    logToFile("AuthController initialized", "INFO");
+
     // Initialize loginData and registerData with empty strings to ensure binding works
     $scope.loginData = { email: "", password: "" };
     $scope.registerData = { email: "", username: "", password: "" };
@@ -44,9 +92,11 @@ angular
     $scope.clearErrors = function () {
       $scope.errorMessage = "";
       $scope.errors = { email: "", password: "", username: "" };
+      logToFile("Form errors cleared", "DEBUG");
     };
 
     $scope.register = function () {
+      logToFile("Registration attempt started", "INFO");
       $scope.clearErrors();
       let hasError = false;
 
@@ -71,29 +121,39 @@ angular
       }
 
       if (hasError) {
+        logToFile("Registration validation failed", "WARN");
         return;
       }
 
-      console.log("Sending register request:", $scope.registerData);
+      logToFile(
+        `Registration request for user: ${$scope.registerData.username}`,
+        "INFO"
+      );
 
       $http
         .post("http://localhost:3000/register", $scope.registerData)
         .then((response) => {
-          console.log("Registration successful:", response.data);
+          logToFile(
+            `Registration successful for user: ${$scope.registerData.username}`,
+            "SUCCESS"
+          );
           $location.path("/login");
         })
         .catch((err) => {
-          console.error("Registration error:", err);
+          logToFile(
+            `Registration failed: ${err.data?.message || err.status}`,
+            "ERROR"
+          );
           $scope.errorMessage =
             "Registration failed: " + (err.data.message || "Unknown error");
         });
     };
 
     $scope.login = function () {
+      logToFile("Login attempt started", "INFO");
       $scope.clearErrors();
       let hasError = false;
 
-      console.log("loginData before validation:", $scope.loginData);
       if (!$scope.loginData.email) {
         $scope.errors.email = "Please enter your email or username.";
         hasError = true;
@@ -104,40 +164,48 @@ angular
       }
 
       if (hasError) {
+        logToFile("Login validation failed", "WARN");
         return;
       }
 
       const loginPayload = {
-        emailOrUsername: $scope.loginData.email.trim(), // Trim to remove any accidental spaces
+        emailOrUsername: $scope.loginData.email.trim(),
         password: $scope.loginData.password.trim(),
       };
 
-      console.log("Sending login request:", loginPayload);
+      logToFile(`Login request for: ${loginPayload.emailOrUsername}`, "INFO");
 
       $http
         .post("http://localhost:3000/login", loginPayload)
         .then((response) => {
-          console.log("Login successful:", response.data);
+          logToFile(
+            `Login successful for: ${loginPayload.emailOrUsername}`,
+            "SUCCESS"
+          );
           localStorage.setItem("token", response.data.token);
           const token = response.data.token;
           const payload = JSON.parse(atob(token.split(".")[1]));
           localStorage.setItem("role", payload.role);
+          logToFile(`User role set to: ${payload.role}`, "INFO");
           $location.path("/app");
         })
         .catch((err) => {
-          console.error("Login error:", err);
+          logToFile(
+            `Login failed: ${err.data?.message || err.status}`,
+            "ERROR"
+          );
           $scope.errorMessage =
             "Login failed: " + (err.data.message || "Unknown error");
         });
     };
 
     $scope.goToLogin = function () {
-      console.log("Navigating to login page");
+      logToFile("Navigating to login page", "INFO");
       $location.path("/login");
     };
 
     $scope.goToRegister = function () {
-      console.log("Navigating to register page");
+      logToFile("Navigating to register page", "INFO");
       $location.path("/register");
     };
 
@@ -156,12 +224,14 @@ angular
   .controller(
     "SnippetController",
     function ($scope, $http, $location, $timeout) {
+      logToFile("SnippetController initialized", "INFO");
+
       $scope.snippets = [];
       $scope.filteredSnippets = [];
       $scope.collectionSnippets = [];
       $scope.filteredCollectionSnippets = [];
       $scope.collectionSnippetIds = new Set();
-      $scope.newSnippet = { category: "", language: "" }; // Updated default values
+      $scope.newSnippet = { category: "", language: "" };
       $scope.editMode = false;
       $scope.searchQuery = "";
       $scope.searchLanguage = "";
@@ -180,7 +250,7 @@ angular
         language: "",
         tags: "",
         category: "",
-      }; // Added category error
+      };
       $scope.copiedSnippets = {};
       $scope.isCopying = false;
       $scope.removedSnippets = {};
@@ -188,15 +258,20 @@ angular
 
       if (localStorage.getItem("token")) {
         $scope.isLoggedIn = true;
+        logToFile("User authenticated, loading data", "INFO");
         loadSnippets();
         loadCollectionSnippetIds();
       } else {
+        logToFile(
+          "No authentication token found, redirecting to login",
+          "WARN"
+        );
         $location.path("/login");
       }
 
       function getConfig() {
         const token = localStorage.getItem("token");
-        console.log("Token being sent:", token);
+        logToFile("Preparing API request configuration", "DEBUG");
         return { headers: { Authorization: token } };
       }
 
@@ -204,14 +279,18 @@ angular
         if (typeof Prism !== "undefined") {
           $timeout(() => {
             Prism.highlightAll();
-            console.log("Prism.js: Highlighted code blocks");
+            logToFile("Code syntax highlighting applied", "DEBUG");
           });
         } else {
-          console.error("Prism.js is not loaded");
+          logToFile(
+            "Prism.js not loaded - syntax highlighting unavailable",
+            "ERROR"
+          );
         }
       }
 
       function loadCollectionSnippetIds() {
+        logToFile("Loading user collection IDs", "INFO");
         $http
           .get("http://localhost:3000/collection", getConfig())
           .then((response) => {
@@ -219,9 +298,16 @@ angular
             $scope.collectionSnippetIds = new Set(
               $scope.collectionSnippets.map((snippet) => snippet._id)
             );
+            logToFile(
+              `Loaded ${response.data.length} collection snippets`,
+              "SUCCESS"
+            );
           })
           .catch((err) => {
-            console.error("Error loading collection IDs:", err);
+            logToFile(
+              `Failed to load collection: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -231,6 +317,7 @@ angular
       }
 
       function loadSnippets() {
+        logToFile("Loading all snippets", "INFO");
         $http
           .get("http://localhost:3000/snippets", getConfig())
           .then((response) => {
@@ -238,9 +325,16 @@ angular
             $scope.filteredSnippets = $scope.snippets;
             $scope.searchSnippets();
             highlightCode();
+            logToFile(
+              `Loaded ${response.data.length} snippets successfully`,
+              "SUCCESS"
+            );
           })
           .catch((err) => {
-            console.error("Error loading snippets:", err);
+            logToFile(
+              `Failed to load snippets: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -269,10 +363,12 @@ angular
           language: "",
           tags: "",
           category: "",
-        }; // Added category error
+        };
+        logToFile("Form errors cleared", "DEBUG");
       };
 
       $scope.saveSnippet = function () {
+        logToFile("Attempting to save new snippet", "INFO");
         $scope.clearErrors();
         let hasError = false;
 
@@ -294,7 +390,6 @@ angular
         }
         // Validate language
         if (!$scope.newSnippet.language) {
-          // Updated to check for empty string
           $scope.errors.language = "Please select a valid language.";
           hasError = true;
         }
@@ -312,7 +407,6 @@ angular
         }
         // Validate category
         if (!$scope.newSnippet.category) {
-          // Added validation for category
           $scope.errors.category = "Please select a category.";
           hasError = true;
         }
@@ -320,6 +414,7 @@ angular
         if (hasError) {
           $scope.errorMessage =
             "Please fix the errors above before submitting.";
+          logToFile("Snippet validation failed", "WARN");
           return;
         }
 
@@ -328,6 +423,9 @@ angular
               .split(",")
               .map((tag) => tag.trim().toLowerCase())
           : [];
+
+        logToFile(`Saving snippet: ${$scope.newSnippet.title}`, "INFO");
+
         $http
           .post(
             "http://localhost:3000/snippets",
@@ -341,12 +439,19 @@ angular
             $scope.clearForm();
             highlightCode();
             $scope.successMessage = "Snippet added successfully!";
+            logToFile(
+              `Snippet saved successfully: ${response.data._id}`,
+              "SUCCESS"
+            );
             $timeout(() => {
               $scope.successMessage = "";
             }, 1000);
           })
           .catch((err) => {
-            console.error("Error saving snippet:", err);
+            logToFile(
+              `Failed to save snippet: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -360,8 +465,10 @@ angular
       };
 
       $scope.editSnippet = function (snippet) {
+        logToFile(`Editing snippet: ${snippet._id}`, "INFO");
         if (snippet.verified && !$scope.isAdmin) {
           $scope.errorMessage = "You cannot edit a verified snippet.";
+          logToFile("Edit attempt blocked - verified snippet", "WARN");
           $timeout(() => {
             $scope.errorMessage = "";
           }, 2000);
@@ -381,10 +488,11 @@ angular
       };
 
       $scope.updateSnippet = function () {
+        logToFile(`Updating snippet: ${$scope.newSnippet._id}`, "INFO");
         $scope.clearErrors();
         let hasError = false;
 
-        // Validate title
+        // Same validation as saveSnippet
         if (
           !$scope.newSnippet.title ||
           $scope.newSnippet.title.trim().length === 0
@@ -392,7 +500,6 @@ angular
           $scope.errors.title = "Please enter a title for the snippet.";
           hasError = true;
         }
-        // Validate tags
         if (
           !$scope.newSnippet.tags ||
           $scope.newSnippet.tags.trim().length === 0
@@ -400,13 +507,10 @@ angular
           $scope.errors.tags = "Please enter at least one tag for the snippet.";
           hasError = true;
         }
-        // Validate language
         if (!$scope.newSnippet.language) {
-          // Updated to check for empty string
           $scope.errors.language = "Please select a valid language.";
           hasError = true;
         }
-        // Validate code
         if (
           !$scope.newSnippet.code ||
           $scope.newSnippet.code.trim().length === 0
@@ -418,9 +522,7 @@ angular
             "Code snippet is too short! Please provide a meaningful snippet.";
           hasError = true;
         }
-        // Validate category
         if (!$scope.newSnippet.category) {
-          // Added validation for category
           $scope.errors.category = "Please select a category.";
           hasError = true;
         }
@@ -428,6 +530,7 @@ angular
         if (hasError) {
           $scope.errorMessage =
             "Please fix the errors above before submitting.";
+          logToFile("Snippet update validation failed", "WARN");
           return;
         }
 
@@ -436,6 +539,7 @@ angular
               .split(",")
               .map((tag) => tag.trim().toLowerCase())
           : [];
+
         $http
           .put(
             `http://localhost:3000/snippets/${$scope.newSnippet._id}`,
@@ -461,12 +565,16 @@ angular
             $scope.clearForm();
             highlightCode();
             $scope.successMessage = "Snippet updated successfully!";
+            logToFile(`Snippet updated successfully: ${snippetId}`, "SUCCESS");
             $timeout(() => {
               $scope.successMessage = "";
             }, 1000);
           })
           .catch((err) => {
-            console.error("Error updating snippet:", err);
+            logToFile(
+              `Failed to update snippet: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -480,6 +588,7 @@ angular
       };
 
       $scope.deleteSnippet = function (snippetId) {
+        logToFile(`Deleting snippet: ${snippetId}`, "INFO");
         $scope.deletedSnippets[snippetId] = true;
         if (!$scope.$$phase) {
           $scope.$apply();
@@ -501,13 +610,20 @@ angular
               $scope.searchCollectionSnippets();
               highlightCode();
               $scope.deletedSnippets[snippetId] = false;
+              logToFile(
+                `Snippet deleted successfully: ${snippetId}`,
+                "SUCCESS"
+              );
               if (!$scope.$$phase) {
                 $scope.$apply();
               }
             }, 300);
           })
           .catch((err) => {
-            console.error("Error deleting snippet:", err);
+            logToFile(
+              `Failed to delete snippet: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             $scope.deletedSnippets[snippetId] = false;
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
@@ -537,16 +653,22 @@ angular
         if (!snippet || !snippet._id) {
           $scope.errorMessage = "Error copying code: Invalid snippet ID";
           $scope.isCopying = false;
+          logToFile("Copy failed - invalid snippet", "ERROR");
           return;
         }
 
         const copyText = snippet.code;
+        logToFile(`Copying snippet to clipboard: ${snippet._id}`, "INFO");
 
         if (navigator.clipboard) {
           navigator.clipboard
             .writeText(copyText)
             .then(() => {
               $scope.copiedSnippets[snippet._id] = true;
+              logToFile(
+                `Snippet copied successfully: ${snippet._id}`,
+                "SUCCESS"
+              );
               if (!$scope.$$phase) {
                 $scope.$apply();
               }
@@ -559,7 +681,7 @@ angular
               }, 300);
             })
             .catch((err) => {
-              console.error("Error copying code with Clipboard API:", err);
+              logToFile(`Clipboard copy failed: ${err.message}`, "ERROR");
               $scope.errorMessage =
                 "Error copying code: " + (err.message || "Unknown error");
               $scope.isCopying = false;
@@ -568,6 +690,7 @@ angular
               }
             });
         } else {
+          // Fallback for older browsers
           const textarea = document.createElement("textarea");
           textarea.value = copyText;
           document.body.appendChild(textarea);
@@ -575,6 +698,10 @@ angular
           try {
             document.execCommand("copy");
             $scope.copiedSnippets[snippet._id] = true;
+            logToFile(
+              `Snippet copied successfully (fallback): ${snippet._id}`,
+              "SUCCESS"
+            );
             if (!$scope.$$phase) {
               $scope.$apply();
             }
@@ -586,7 +713,7 @@ angular
               }
             }, 1000);
           } catch (err) {
-            console.error("Error copying code with execCommand:", err);
+            logToFile(`Copy fallback failed: ${err.message}`, "ERROR");
             $scope.errorMessage =
               "Error copying code: " + (err.message || "Unknown error");
             $scope.isCopying = false;
@@ -600,17 +727,25 @@ angular
       };
 
       $scope.addToCollection = function (snippetId) {
+        logToFile(`Adding snippet to collection: ${snippetId}`, "INFO");
         $http
           .post("http://localhost:3000/collection", { snippetId }, getConfig())
           .then(() => {
             $scope.collectionSnippetIds.add(snippetId);
             $scope.successMessage = "Snippet added to collection!";
+            logToFile(
+              `Snippet added to collection successfully: ${snippetId}`,
+              "SUCCESS"
+            );
             $timeout(() => {
               $scope.successMessage = "";
             }, 1000);
           })
           .catch((err) => {
-            console.error("Error adding to collection:", err);
+            logToFile(
+              `Failed to add to collection: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -624,6 +759,7 @@ angular
       };
 
       $scope.viewCollection = function () {
+        logToFile("Loading user collection view", "INFO");
         $http
           .get("http://localhost:3000/collection", getConfig())
           .then((response) => {
@@ -637,9 +773,16 @@ angular
             $scope.collectionSearchCategory = "";
             $scope.showCollection = true;
             highlightCode();
+            logToFile(
+              `Collection view loaded with ${response.data.length} snippets`,
+              "SUCCESS"
+            );
           })
           .catch((err) => {
-            console.error("Error loading collection:", err);
+            logToFile(
+              `Failed to load collection view: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -649,6 +792,7 @@ angular
       };
 
       $scope.removeFromCollection = function (snippetId) {
+        logToFile(`Removing snippet from collection: ${snippetId}`, "INFO");
         $scope.removedSnippets[snippetId] = true;
         if (!$scope.$$phase) {
           $scope.$apply();
@@ -666,6 +810,10 @@ angular
               highlightCode();
               $scope.removedSnippets[snippetId] = false;
               $scope.successMessage = "Snippet removed from collection!";
+              logToFile(
+                `Snippet removed from collection successfully: ${snippetId}`,
+                "SUCCESS"
+              );
               $timeout(() => {
                 $scope.successMessage = "";
               }, 1000);
@@ -675,7 +823,10 @@ angular
             }, 300);
           })
           .catch((err) => {
-            console.error("Error removing from collection:", err);
+            logToFile(
+              `Failed to remove from collection: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             $scope.removedSnippets[snippetId] = false;
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
@@ -698,6 +849,11 @@ angular
         params.append("language", $scope.searchLanguage || "");
         params.append("category", $scope.searchCategory || "");
 
+        logToFile(
+          `Searching snippets with query: ${$scope.searchQuery}`,
+          "DEBUG"
+        );
+
         $http
           .get(
             `http://localhost:3000/snippets/search?${params.toString()}`,
@@ -706,9 +862,16 @@ angular
           .then((response) => {
             $scope.filteredSnippets = response.data;
             highlightCode();
+            logToFile(
+              `Search returned ${response.data.length} results`,
+              "SUCCESS"
+            );
           })
           .catch((err) => {
-            console.error("Error searching snippets:", err);
+            logToFile(
+              `Search failed: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -718,6 +881,7 @@ angular
       };
 
       $scope.searchCollectionSnippets = function () {
+        logToFile("Searching collection snippets", "DEBUG");
         let filtered = $scope.collectionSnippets;
 
         if ($scope.collectionSearchLanguage) {
@@ -749,9 +913,14 @@ angular
 
         $scope.filteredCollectionSnippets = filtered;
         highlightCode();
+        logToFile(
+          `Collection search returned ${filtered.length} results`,
+          "SUCCESS"
+        );
       };
 
       $scope.verifySnippet = function (snippetId) {
+        logToFile(`Verifying snippet: ${snippetId}`, "INFO");
         // Save the current scroll position
         const scrollPosition = window.scrollY;
 
@@ -765,7 +934,7 @@ angular
             // Update the snippet in $scope.snippets
             const index = $scope.snippets.findIndex((s) => s._id === snippetId);
             if (index !== -1) {
-              $scope.snippets[index].verified = response.data.verified; // Update only the verified field
+              $scope.snippets[index].verified = response.data.verified;
             }
 
             // Update the snippet in $scope.collectionSnippets
@@ -797,6 +966,7 @@ angular
             }
 
             highlightCode();
+            logToFile(`Snippet verified successfully: ${snippetId}`, "SUCCESS");
 
             // Restore the original scroll position after the DOM updates
             $timeout(() => {
@@ -804,7 +974,10 @@ angular
             }, 0);
           })
           .catch((err) => {
-            console.error("Error verifying snippet:", err);
+            logToFile(
+              `Failed to verify snippet: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -818,6 +991,7 @@ angular
       };
 
       $scope.reportInvalid = function (snippetId) {
+        logToFile(`Reporting snippet as invalid: ${snippetId}`, "INFO");
         // Save the current scroll position
         const scrollPosition = window.scrollY;
 
@@ -831,7 +1005,7 @@ angular
             // Update the snippet in $scope.snippets
             const index = $scope.snippets.findIndex((s) => s._id === snippetId);
             if (index !== -1) {
-              $scope.snippets[index].verified = response.data.verified; // Update only the verified field
+              $scope.snippets[index].verified = response.data.verified;
             }
 
             // Update the snippet in $scope.collectionSnippets
@@ -863,6 +1037,10 @@ angular
             }
 
             highlightCode();
+            logToFile(
+              `Snippet reported as invalid successfully: ${snippetId}`,
+              "SUCCESS"
+            );
 
             // Restore the original scroll position after the DOM updates
             $timeout(() => {
@@ -870,7 +1048,10 @@ angular
             }, 0);
           })
           .catch((err) => {
-            console.error("Error reporting snippet as invalid:", err);
+            logToFile(
+              `Failed to report snippet as invalid: ${err.status} - ${err.data?.message}`,
+              "ERROR"
+            );
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -882,17 +1063,33 @@ angular
             }, 0);
           });
       };
+
       $scope.clearForm = function () {
-        $scope.newSnippet = { category: "", language: "" }; // Updated default values
+        $scope.newSnippet = { category: "", language: "" };
         $scope.editMode = false;
         $scope.clearErrors();
+        logToFile("Form cleared", "DEBUG");
       };
 
       $scope.logout = function () {
+        logToFile("User logging out", "INFO");
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         $scope.isLoggedIn = false;
         $location.path("/login");
       };
+
+      // Expose logging functions for debugging in browser console
+      window.exportSnippetLogs = exportLogs;
+      window.clearSnippetLogs = clearLogs;
+      window.viewSnippetLogs = function () {
+        const logs = JSON.parse(
+          localStorage.getItem("snippetManagerLogs") || "[]"
+        );
+        console.table(logs);
+        return logs;
+      };
+
+      logToFile("SnippetController initialization complete", "SUCCESS");
     }
   );
