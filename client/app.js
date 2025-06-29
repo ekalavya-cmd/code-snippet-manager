@@ -88,6 +88,7 @@ angular
     $scope.registerData = { email: "", username: "", password: "" };
     $scope.errorMessage = "";
     $scope.errors = { email: "", password: "", username: "" };
+    $scope.successMessage = "";
 
     $scope.clearErrors = function () {
       $scope.errorMessage = "";
@@ -95,6 +96,7 @@ angular
       logToFile("Form errors cleared", "DEBUG");
     };
 
+    // Replace the existing register function in AuthController with this enhanced version:
     $scope.register = function () {
       logToFile("Registration attempt started", "INFO");
       $scope.clearErrors();
@@ -109,14 +111,33 @@ angular
           "Email must be a valid @csm.com address (e.g., user@csm.com).";
         hasError = true;
       }
-      // Validate password
+
+      // Enhanced password validation
       if (!$scope.registerData.password) {
         $scope.errors.password = "Please enter your password.";
         hasError = true;
+      } else if ($scope.registerData.password.length < 6) {
+        $scope.errors.password = "Password must be at least 6 characters long.";
+        hasError = true;
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])/.test($scope.registerData.password)) {
+        $scope.errors.password =
+          "Password must contain both uppercase and lowercase letters.";
+        hasError = true;
+      } else if (!/(?=.*\d)/.test($scope.registerData.password)) {
+        $scope.errors.password = "Password must contain at least one number.";
+        hasError = true;
       }
-      // Validate username
+
+      // Validate username (case-sensitive)
       if (!$scope.registerData.username) {
         $scope.errors.username = "Please enter your username.";
+        hasError = true;
+      } else if ($scope.registerData.username.length < 3) {
+        $scope.errors.username = "Username must be at least 3 characters long.";
+        hasError = true;
+      } else if (!/^[a-zA-Z0-9_]+$/.test($scope.registerData.username)) {
+        $scope.errors.username =
+          "Username can only contain letters, numbers, and underscores.";
         hasError = true;
       }
 
@@ -137,7 +158,14 @@ angular
             `Registration successful for user: ${$scope.registerData.username}`,
             "SUCCESS"
           );
-          $location.path("/login");
+          $scope.successMessage = "Account created successfully! Please login.";
+          // Clear form data
+          $scope.registerData = { email: "", username: "", password: "" };
+          // Auto-redirect to login after 2 seconds
+          setTimeout(() => {
+            $location.path("/login");
+            $scope.$apply();
+          }, 2000);
         })
         .catch((err) => {
           logToFile(
@@ -148,6 +176,8 @@ angular
             "Registration failed: " + (err.data.message || "Unknown error");
         });
     };
+
+    // Add the browseAllSnippets function to SnippetController:
 
     $scope.login = function () {
       logToFile("Login attempt started", "INFO");
@@ -201,21 +231,86 @@ angular
 
     $scope.goToLogin = function () {
       logToFile("Navigating to login page", "INFO");
+      $scope.clearErrors(); // Clear any existing errors
       $location.path("/login");
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
     };
 
     $scope.goToRegister = function () {
       logToFile("Navigating to register page", "INFO");
+      $scope.clearErrors(); // Clear any existing errors
       $location.path("/register");
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
     };
 
+    // Add these password strength functions to AuthController:
+    $scope.getPasswordStrength = function (password) {
+      if (!password) return "weak";
+
+      let score = 0;
+      if (password.length >= 6) score++;
+      if (/(?=.*[a-z])(?=.*[A-Z])/.test(password)) score++;
+      if (/(?=.*\d)/.test(password)) score++;
+      if (/(?=.*[!@#$%^&*])/.test(password)) score++;
+      if (password.length >= 10) score++;
+
+      if (score <= 2) return "weak";
+      if (score <= 3) return "medium";
+      return "strong";
+    };
+
+    $scope.getPasswordStrengthWidth = function (password) {
+      const strength = $scope.getPasswordStrength(password);
+      switch (strength) {
+        case "weak":
+          return 25;
+        case "medium":
+          return 60;
+        case "strong":
+          return 100;
+        default:
+          return 0;
+      }
+    };
+
+    // Enhanced onEnter function for AuthController
     $scope.onEnter = function (event, nextFieldId, submitFunction) {
-      if (event.key === "Enter") {
+      // Handle Shift+Enter for new lines in textarea
+      if (event.key === "Enter" && event.shiftKey) {
+        // Allow default behavior (new line) for textarea when Shift+Enter is pressed
+        if (event.target.tagName.toLowerCase() === "textarea") {
+          return; // Let the default behavior handle new line creation
+        }
+      }
+
+      // Handle regular Enter key
+      if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
+
         if (nextFieldId) {
           const nextField = document.getElementById(nextFieldId);
-          if (nextField) nextField.focus();
+          if (nextField) {
+            // Special handling for select elements
+            if (nextField.tagName.toLowerCase() === "select") {
+              nextField.focus();
+              // Optionally open the dropdown
+              const event = new MouseEvent("mousedown", {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+              });
+              nextField.dispatchEvent(event);
+            } else {
+              nextField.focus();
+            }
+            logToFile(`Navigation: moved to field ${nextFieldId}`, "DEBUG");
+          }
         } else if (submitFunction) {
+          logToFile("Navigation: submitting form", "DEBUG");
           submitFunction();
         }
       }
@@ -256,8 +351,32 @@ angular
       $scope.removedSnippets = {};
       $scope.deletedSnippets = {};
 
+      // Add this function to provide better navigation feedback
+      $scope.enhancedFormNavigation = function () {
+        // Add visual feedback for form navigation
+        const style = document.createElement("style");
+        style.textContent = `
+          .form-control:focus, .form-select:focus {
+            border-color: #6f42c1 !important;
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25) !important;
+            background-color: #fff !important;
+            transition: all 0.3s ease !important;
+          }
+          
+          .navigation-hint {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+          }
+        `;
+        document.head.appendChild(style);
+        logToFile("Enhanced form navigation styles applied", "DEBUG");
+      };
+
+      // Initialize user session and data loading
       if (localStorage.getItem("token")) {
         $scope.isLoggedIn = true;
+        $scope.enhancedFormNavigation(); // Add this line
         logToFile("User authenticated, loading data", "INFO");
         loadSnippets();
         loadCollectionSnippetIds();
@@ -343,13 +462,41 @@ angular
           });
       }
 
+      // Enhanced onEnter function for SnippetController with Shift+Enter support
       $scope.onEnter = function (event, nextFieldId, submitFunction) {
-        if (event.key === "Enter") {
+        // Handle Shift+Enter for new lines in textarea
+        if (event.key === "Enter" && event.shiftKey) {
+          // Allow default behavior (new line) for textarea when Shift+Enter is pressed
+          if (event.target.tagName.toLowerCase() === "textarea") {
+            logToFile("Shift+Enter: New line added in textarea", "DEBUG");
+            return; // Let the default behavior handle new line creation
+          }
+        }
+
+        // Handle regular Enter key
+        if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
+
           if (nextFieldId) {
             const nextField = document.getElementById(nextFieldId);
-            if (nextField) nextField.focus();
+            if (nextField) {
+              // Special handling for select elements
+              if (nextField.tagName.toLowerCase() === "select") {
+                nextField.focus();
+                // Optionally open the dropdown
+                const mouseEvent = new MouseEvent("mousedown", {
+                  view: window,
+                  bubbles: true,
+                  cancelable: true,
+                });
+                nextField.dispatchEvent(mouseEvent);
+              } else {
+                nextField.focus();
+              }
+              logToFile(`Navigation: moved to field ${nextFieldId}`, "DEBUG");
+            }
           } else if (submitFunction) {
+            logToFile("Navigation: submitting form", "DEBUG");
             submitFunction();
           }
         }
@@ -794,33 +941,53 @@ angular
       $scope.removeFromCollection = function (snippetId) {
         logToFile(`Removing snippet from collection: ${snippetId}`, "INFO");
         $scope.removedSnippets[snippetId] = true;
+
+        // Force UI update
         if (!$scope.$$phase) {
           $scope.$apply();
         }
+
         $http
           .delete(`http://localhost:3000/collection/${snippetId}`, getConfig())
           .then(() => {
             $timeout(() => {
+              // Remove from collection arrays
               $scope.collectionSnippets = $scope.collectionSnippets.filter(
                 (s) => s._id !== snippetId
               );
-              $scope.filteredCollectionSnippets = $scope.collectionSnippets;
+              $scope.filteredCollectionSnippets =
+                $scope.filteredCollectionSnippets.filter(
+                  (s) => s._id !== snippetId
+                );
+
+              // Remove from collection ID set
               $scope.collectionSnippetIds.delete(snippetId);
+
+              // Re-run search to update filtered results
               $scope.searchCollectionSnippets();
-              highlightCode();
+
+              // Clear the removed state
               $scope.removedSnippets[snippetId] = false;
+
+              // Apply syntax highlighting to remaining snippets
+              highlightCode();
+
               $scope.successMessage = "Snippet removed from collection!";
               logToFile(
                 `Snippet removed from collection successfully: ${snippetId}`,
                 "SUCCESS"
               );
+
+              // Clear success message after 2 seconds
               $timeout(() => {
                 $scope.successMessage = "";
-              }, 1000);
+              }, 2000);
+
+              // Force UI update
               if (!$scope.$$phase) {
                 $scope.$apply();
               }
-            }, 300);
+            }, 300); // Small delay for visual feedback
           })
           .catch((err) => {
             logToFile(
@@ -828,6 +995,7 @@ angular
               "ERROR"
             );
             $scope.removedSnippets[snippetId] = false;
+
             if (err.status === 401 || err.status === 403) {
               localStorage.removeItem("token");
               $scope.isLoggedIn = false;
@@ -835,8 +1003,15 @@ angular
             } else {
               $scope.errorMessage =
                 "Error removing from collection: " +
-                (err.data.message || "Unknown error");
+                (err.data?.message || "Unknown error");
+
+              // Clear error message after 3 seconds
+              $timeout(() => {
+                $scope.errorMessage = "";
+              }, 3000);
             }
+
+            // Force UI update
             if (!$scope.$$phase) {
               $scope.$apply();
             }
@@ -1062,6 +1237,19 @@ angular
               window.scrollTo(0, scrollPosition);
             }, 0);
           });
+      };
+
+      $scope.browseAllSnippets = function () {
+        logToFile("Browsing all snippets from empty collection", "INFO");
+        $scope.showCollection = false;
+        // Clear search filters
+        $scope.searchQuery = "";
+        $scope.searchLanguage = "";
+        $scope.searchCategory = "";
+        // Refresh snippets
+        $scope.searchSnippets();
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
       };
 
       $scope.clearForm = function () {

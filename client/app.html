@@ -66,7 +66,7 @@
                   ng-model="newSnippet.title"
                   placeholder="Enter snippet title"
                   required
-                  ng-keydown="onEnter($event, 'snippet-code')"
+                  ng-keydown="onEnter($event, 'snippet-language')"
                   ng-change="clearErrors()"
                   tabindex="1"
                 />
@@ -87,9 +87,9 @@
                   ng-class="{'is-invalid': errors.language}"
                   ng-model="newSnippet.language"
                   required
-                  ng-keydown="onEnter($event, 'snippet-tags')"
+                  ng-keydown="onEnter($event, 'snippet-code')"
                   ng-change="clearErrors()"
-                  tabindex="3"
+                  tabindex="2"
                 >
                   <option value="">Select Language</option>
                   <option value="javascript">JavaScript</option>
@@ -101,6 +101,7 @@
                   <option value="php">PHP</option>
                   <option value="sql">SQL</option>
                 </select>
+
                 <div ng-if="errors.language" class="field-error">
                   {{errors.language}}
                 </div>
@@ -118,12 +119,12 @@
                 class="form-control"
                 ng-class="{'is-invalid': errors.code}"
                 ng-model="newSnippet.code"
-                placeholder="Paste your code here..."
+                placeholder="Paste your code here... (Use Shift+Enter for new lines)"
                 required
                 rows="8"
                 ng-keydown="onEnter($event, 'snippet-tags')"
                 ng-change="clearErrors()"
-                tabindex="2"
+                tabindex="3"
                 style="font-family: 'Fira Code', monospace"
               ></textarea>
               <div ng-if="errors.code" class="field-error">{{errors.code}}</div>
@@ -218,6 +219,8 @@
     </div>
   </div>
 
+  <!-- Replace the Search Snippets section with this enhanced version: -->
+
   <!-- Search Section -->
   <div class="row mb-4" ng-show="!showCollection">
     <div class="col-12">
@@ -245,7 +248,9 @@
                     class="form-control"
                     ng-model="searchQuery"
                     ng-change="searchSnippets()"
+                    ng-keydown="onEnter($event, 'search-language-all')"
                     placeholder="Search by title, code, or tags..."
+                    tabindex="1"
                   />
                 </div>
               </div>
@@ -260,6 +265,8 @@
                   class="form-select"
                   ng-model="searchLanguage"
                   ng-change="searchSnippets()"
+                  ng-keydown="onEnter($event, 'search-category-all')"
+                  tabindex="2"
                 >
                   <option value="">All Languages</option>
                   <option value="javascript">JavaScript</option>
@@ -283,6 +290,8 @@
                   class="form-select"
                   ng-model="searchCategory"
                   ng-change="searchSnippets()"
+                  ng-keydown="onEnter($event, 'view-collection-btn')"
+                  tabindex="3"
                 >
                   <option value="">All Categories</option>
                   <option value="Frontend">Frontend</option>
@@ -296,7 +305,12 @@
           </div>
 
           <div class="mt-3">
-            <button class="btn btn-gradient-info" ng-click="viewCollection()">
+            <button
+              id="view-collection-btn"
+              class="btn btn-gradient-info"
+              ng-click="viewCollection()"
+              tabindex="4"
+            >
               <i class="bi bi-collection me-2"></i>
               View My Collection
             </button>
@@ -333,7 +347,9 @@
                     class="form-control"
                     ng-model="collectionSearchQuery"
                     ng-change="searchCollectionSnippets()"
+                    ng-keydown="onEnter($event, 'search-language-collection')"
                     placeholder="Search my collection..."
+                    tabindex="1"
                   />
                 </div>
               </div>
@@ -348,6 +364,8 @@
                   class="form-select"
                   ng-model="collectionSearchLanguage"
                   ng-change="searchCollectionSnippets()"
+                  ng-keydown="onEnter($event, 'search-category-collection')"
+                  tabindex="2"
                 >
                   <option value="">All Languages</option>
                   <option value="javascript">JavaScript</option>
@@ -371,6 +389,8 @@
                   class="form-select"
                   ng-model="collectionSearchCategory"
                   ng-change="searchCollectionSnippets()"
+                  ng-keydown="onEnter($event, 'back-to-all-btn')"
+                  tabindex="3"
                 >
                   <option value="">All Categories</option>
                   <option value="Frontend">Frontend</option>
@@ -385,8 +405,10 @@
 
           <div class="mt-3">
             <button
+              id="back-to-all-btn"
               class="btn btn-gradient-secondary"
               ng-click="showCollection = false"
+              tabindex="4"
             >
               <i class="bi bi-arrow-left me-2"></i>
               Back to All Snippets
@@ -431,35 +453,37 @@
           <div class="card-body">
             <h3 class="snippet-title">{{snippet.title}}</h3>
 
-            <!-- Snippet Meta -->
-            <div class="row snippet-meta mb-3">
-              <div class="col-md-4">
-                <strong>
-                  <i class="bi bi-code me-1"></i>
-                  Language:
-                </strong>
-                <span class="badge bg-light text-dark ms-1">
-                  {{snippet.language | capitalize}}
-                </span>
-              </div>
-              <div class="col-md-4">
-                <strong>
-                  <i class="bi bi-folder me-1"></i>
-                  Category:
-                </strong>
-                <span class="badge bg-light text-dark ms-1"
-                  >{{snippet.category}}</span
-                >
-              </div>
-              <div class="col-md-4">
-                <strong>
-                  <i class="bi bi-tags me-1"></i>
-                  Tags:
-                </strong>
-                <div class="tag-list d-inline-flex">
-                  <span ng-repeat="tag in snippet.tags" class="tag-item"
-                    >{{tag}}</span
+            <!-- Snippet Meta - Fixed Layout -->
+            <div class="snippet-meta mb-3">
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                  <strong>
+                    <i class="bi bi-code me-1"></i>
+                    Language:
+                  </strong>
+                  <span class="badge bg-light text-dark ms-1">
+                    {{snippet.language | capitalize}}
+                  </span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <strong>
+                    <i class="bi bi-folder me-1"></i>
+                    Category:
+                  </strong>
+                  <span class="badge bg-light text-dark ms-1"
+                    >{{snippet.category}}</span
                   >
+                </div>
+                <div class="d-flex align-items-center">
+                  <strong>
+                    <i class="bi bi-tags me-1"></i>
+                    Tags:
+                  </strong>
+                  <div class="tag-list d-inline-flex ms-1">
+                    <span ng-repeat="tag in snippet.tags" class="tag-item me-1"
+                      >{{tag}}</span
+                    >
+                  </div>
                 </div>
               </div>
             </div>
@@ -560,6 +584,7 @@
       </div>
     </div>
 
+    <!-- Replace the empty collection message section with this: -->
     <!-- Empty Collection Message -->
     <div ng-if="filteredCollectionSnippets.length === 0" class="row">
       <div class="col-12">
@@ -573,7 +598,7 @@
             </p>
             <button
               class="btn btn-gradient-primary"
-              ng-click="showCollection = false"
+              ng-click="browseAllSnippets()"
             >
               <i class="bi bi-plus-circle me-2"></i>
               Browse All Snippets

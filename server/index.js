@@ -73,13 +73,46 @@ app.post("/register", async (req, res) => {
       return res.status(500).json({ message: "Database connection error" });
     }
 
-    // Check for existing user
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      console.log("User already exists:", { email, username });
+    // Check for existing email and username separately for specific error messages
+    const existingEmail = await User.findOne({
+      email: { $regex: new RegExp(`^${email}$`, "i") },
+    });
+
+    const existingUsername = await User.findOne({
+      username: { $regex: new RegExp(`^${username}$`, "i") },
+    });
+
+    if (existingEmail && existingUsername) {
+      console.log("Both email and username already exist:", {
+        email,
+        username,
+      });
       return res
         .status(400)
-        .json({ message: "Email or username already exists" });
+        .json({
+          message:
+            "Both email and username are already registered. Please use different credentials.",
+        });
+    }
+
+    if (existingEmail) {
+      console.log("Email already exists:", email);
+      return res
+        .status(400)
+        .json({
+          message:
+            "This email is already registered. Please use a different email or try logging in.",
+        });
+    }
+
+    if (existingUsername) {
+      console.log("Username already exists:", username);
+      return res
+        .status(400)
+        .json({
+          message:
+            "This username is already taken. Please choose a different username.",
+        });
     }
 
     // Hash the password
@@ -102,7 +135,9 @@ app.post("/register", async (req, res) => {
     console.log("User save operation completed. Saved user:", savedUser);
 
     // Verify that the user was actually saved by querying the database
-    const verifyUser = await User.findOne({ username });
+    const verifyUser = await User.findOne({
+      username: { $regex: new RegExp(`^${username}$`, "i") },
+    });
     if (!verifyUser) {
       console.error("User was not found in the database after save:", {
         email,
@@ -114,10 +149,29 @@ app.post("/register", async (req, res) => {
     }
     console.log("User verified in database:", verifyUser);
 
-    res.status(201).json({ message: "User registered" });
+    res.status(201).json({
+      message: `Account created successfully! Welcome ${username}! You can now login with your credentials.`,
+    });
   } catch (err) {
     console.error("Error during registration:", err);
-    res.status(400).json({ message: err.message });
+
+    // Handle MongoDB duplicate key error (E11000)
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      const value = err.keyValue[field];
+
+      if (field === "email") {
+        return res.status(400).json({
+          message: `The email "${value}" is already registered. Please use a different email or try logging in.`,
+        });
+      } else if (field === "username") {
+        return res.status(400).json({
+          message: `The username "${value}" is already taken. Please choose a different username.`,
+        });
+      }
+    }
+
+    res.status(400).json({ message: "Registration failed. Please try again." });
   }
 });
 
@@ -125,29 +179,43 @@ app.post("/login", async (req, res) => {
   const { emailOrUsername, password } = req.body;
   console.log("Login request received:", { emailOrUsername });
 
-  const user = await User.findOne({
-    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
-  });
+  try {
+    // Create case-insensitive search for both email and username
+    const searchCriteria = {
+      $or: [
+        { email: { $regex: new RegExp(`^${emailOrUsername}$`, "i") } },
+        { username: { $regex: new RegExp(`^${emailOrUsername}$`, "i") } },
+      ],
+    };
 
-  if (!user) {
-    console.log("User not found:", emailOrUsername);
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
+    const user = await User.findOne(searchCriteria);
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) {
-    console.log("Password does not match for user:", emailOrUsername);
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1h",
+    if (!user) {
+      console.log("User not found:", emailOrUsername);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-  );
-  res.json({ token });
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      console.log("Password does not match for user:", emailOrUsername);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    console.log("Login successful for user:", user.username);
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    console.error("Error during login:", err);
+    res.status(500).json({ message: "Server error during login" });
+  }
 });
 
 app.get("/snippets", authenticateToken, async (req, res) => {
