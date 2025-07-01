@@ -41,7 +41,6 @@
                 placeholder="Enter your email or username"
                 required
                 ng-keydown="onEnter($event, 'login-password')"
-                ng-change="clearErrors()"
                 tabindex="1"
                 autocomplete="username"
               />
@@ -67,7 +66,6 @@
                   placeholder="Enter your password"
                   required
                   ng-keydown="onEnter($event, null, login)"
-                  ng-change="clearErrors()"
                   tabindex="2"
                   autocomplete="current-password"
                 />

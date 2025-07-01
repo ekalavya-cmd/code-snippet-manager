@@ -67,7 +67,6 @@
                   placeholder="Enter snippet title"
                   required
                   ng-keydown="onEnter($event, 'snippet-language')"
-                  ng-change="clearErrors()"
                   tabindex="1"
                 />
                 <div ng-if="errors.title" class="field-error">
@@ -88,7 +87,6 @@
                   ng-model="newSnippet.language"
                   required
                   ng-keydown="onEnter($event, 'snippet-code')"
-                  ng-change="clearErrors()"
                   tabindex="2"
                 >
                   <option value="">Select Language</option>
@@ -123,7 +121,6 @@
                 required
                 rows="8"
                 ng-keydown="onEnter($event, 'snippet-tags')"
-                ng-change="clearErrors()"
                 tabindex="3"
                 style="font-family: 'Fira Code', monospace"
               ></textarea>
@@ -145,7 +142,6 @@
                   ng-model="newSnippet.tags"
                   placeholder="e.g., api, authentication, helper"
                   ng-keydown="onEnter($event, 'snippet-category')"
-                  ng-change="clearErrors()"
                   tabindex="4"
                 />
                 <div class="form-text">Separate tags with commas</div>
@@ -166,7 +162,6 @@
                   ng-class="{'is-invalid': errors.category}"
                   ng-model="newSnippet.category"
                   ng-keydown="onEnter($event, null, editMode ? updateSnippet : saveSnippet)"
-                  ng-change="clearErrors()"
                   tabindex="5"
                 >
                   <option value="">Select Category</option>

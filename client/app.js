@@ -99,6 +99,20 @@ angular
       logToFile("Form errors cleared", "DEBUG");
     };
 
+    // Auto-clear error messages after 5 seconds
+    $scope.autoHideErrors = function () {
+      if (
+        $scope.errorMessage ||
+        Object.values($scope.errors).some((error) => error)
+      ) {
+        $timeout(() => {
+          $scope.errorMessage = "";
+          $scope.errors = { email: "", password: "", username: "" };
+          logToFile("Form errors auto-cleared after timeout", "DEBUG");
+        }, 5000); // 5 seconds delay
+      }
+    };
+
     // Toggle password visibility function
     $scope.togglePasswordVisibility = function (formType) {
       if (formType === "login") {
