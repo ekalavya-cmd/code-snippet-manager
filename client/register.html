@@ -1,23 +1,25 @@
 <div
-  class="container-fluid min-vh-100 d-flex align-items-center justify-content-center"
+  class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-3"
   ng-controller="AuthController"
 >
   <div class="row w-100 justify-content-center">
-    <div class="col-12 col-md-6 col-lg-5">
+    <div class="col-12 col-md-6 col-lg-5 col-xl-4">
       <div class="card custom-card shadow-lg">
-        <div class="card-body p-5">
-          <div class="text-center mb-4">
-            <h1 class="header-title">
+        <div class="card-body p-4">
+          <div class="text-center mb-3">
+            <h1 class="header-title mb-2">
               <i class="bi bi-person-plus-fill me-2"></i>
               Create Account
             </h1>
-            <p class="text-muted">Join the Code Snippet Manager community</p>
+            <p class="text-muted mb-0">
+              Join the Code Snippet Manager community
+            </p>
           </div>
 
           <!-- Success Message -->
           <div
             ng-if="successMessage"
-            class="alert alert-custom-success d-flex align-items-center mb-4"
+            class="alert alert-custom-success d-flex align-items-center mb-3"
             role="alert"
           >
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -27,7 +29,7 @@
           <!-- Error Message -->
           <div
             ng-if="errorMessage"
-            class="alert alert-custom-error d-flex align-items-center mb-4"
+            class="alert alert-custom-error d-flex align-items-center mb-3"
             role="alert"
           >
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -37,7 +39,7 @@
           <!-- Registration Form -->
           <form id="registerForm" ng-submit="register()" novalidate>
             <!-- Email Field -->
-            <div class="mb-4">
+            <div class="mb-3">
               <label for="register-email" class="form-label">
                 <i class="bi bi-envelope-fill me-1"></i>
                 Email Address
@@ -66,7 +68,7 @@
             </div>
 
             <!-- Password Field -->
-            <div class="mb-4">
+            <div class="mb-3">
               <label for="register-password" class="form-label">
                 <i class="bi bi-lock-fill me-1"></i>
                 Password
@@ -101,7 +103,7 @@
 
               <!-- Password Strength Indicator -->
               <div ng-if="registerData.password" class="password-strength mt-2">
-                <div class="progress" style="height: 5px">
+                <div class="progress" style="height: 4px">
                   <div
                     class="progress-bar"
                     ng-class="{
@@ -126,10 +128,9 @@
                 </small>
               </div>
 
-              <div class="form-text mt-2">
+              <div class="form-text mt-1">
                 <i class="bi bi-info-circle me-1"></i>
-                Must be at least 6 characters with uppercase, lowercase, and
-                numbers
+                At least 6 characters with uppercase, lowercase, and numbers
               </div>
               <div ng-if="errors.password" class="field-error">
                 <i class="bi bi-exclamation-circle me-1"></i>
@@ -138,7 +139,7 @@
             </div>
 
             <!-- Username Field -->
-            <div class="mb-4">
+            <div class="mb-3">
               <label for="register-username" class="form-label">
                 <i class="bi bi-person-badge-fill me-1"></i>
                 Username
@@ -167,7 +168,7 @@
             </div>
 
             <!-- Register Button -->
-            <div class="d-grid mb-4">
+            <div class="d-grid mb-3">
               <button
                 id="register-button"
                 type="submit"

@@ -649,3 +649,117 @@ body {
     padding: 0.2rem 0.6rem !important;
   }
 }
+/* Compact Register Page Optimizations */
+
+/* Reduce card body padding for register page */
+#registerForm .card-body {
+  padding: 1.5rem !important;
+}
+
+/* Optimize form field spacing */
+#registerForm .mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+#registerForm .mb-3 {
+  margin-bottom: 0.75rem !important;
+}
+
+/* Compact header spacing */
+#registerForm .header-title {
+  font-size: 2.2rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+#registerForm .text-center {
+  margin-bottom: 1rem !important;
+}
+
+/* Reduce form text and error spacing */
+#registerForm .form-text {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+#registerForm .field-error {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* Compact password strength indicator */
+#registerForm .password-strength {
+  margin-top: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+#registerForm .password-strength .progress {
+  height: 3px;
+  margin-bottom: 0.25rem;
+}
+
+#registerForm .password-strength small {
+  font-size: 0.75rem;
+}
+
+/* Reduce alert spacing */
+#registerForm .alert {
+  margin-bottom: 0.75rem !important;
+  padding: 0.6rem 0.8rem !important;
+  font-size: 0.9rem;
+}
+
+/* Optimize button spacing */
+#registerForm .d-grid {
+  margin-bottom: 1rem !important;
+}
+
+/* Responsive optimizations */
+@media (max-width: 768px) {
+  #registerForm .card-body {
+    padding: 1.25rem !important;
+  }
+
+  #registerForm .header-title {
+    font-size: 2rem !important;
+  }
+
+  #registerForm .mb-3 {
+    margin-bottom: 0.6rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  #registerForm .card-body {
+    padding: 1rem !important;
+  }
+
+  #registerForm .header-title {
+    font-size: 1.8rem !important;
+  }
+
+  /* Reduce container padding on mobile */
+  .container-fluid.min-vh-100 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+}
+
+/* Ensure the register form container uses available height efficiently */
+#registerForm .min-vh-100 {
+  min-height: 100vh;
+  padding: 1rem 0;
+}
+
+@media (min-height: 700px) {
+  #registerForm .min-vh-100 {
+    padding: 2rem 0;
+  }
+}
+
+@media (min-height: 900px) {
+  #registerForm .min-vh-100 {
+    padding: 3rem 0;
+  }
+}
