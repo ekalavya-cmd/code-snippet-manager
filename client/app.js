@@ -80,7 +80,7 @@ angular
       });
     logToFile("Application routes configured successfully", "INFO");
   })
-  .controller("AuthController", function ($scope, $http, $location) {
+  .controller("AuthController", function ($scope, $http, $location, $timeout) {
     logToFile("AuthController initialized", "INFO");
 
     // Initialize loginData and registerData with empty strings to ensure binding works
@@ -191,6 +191,7 @@ angular
 
       if (hasError) {
         logToFile("Registration validation failed", "WARN");
+        $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
         return;
       }
 
@@ -230,10 +231,9 @@ angular
           );
           $scope.errorMessage =
             "Registration failed: " + (err.data.message || "Unknown error");
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
         });
     };
-
-    // Add the browseAllSnippets function to SnippetController:
 
     $scope.login = function () {
       logToFile("Login attempt started", "INFO");
@@ -251,6 +251,7 @@ angular
 
       if (hasError) {
         logToFile("Login validation failed", "WARN");
+        $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
         return;
       }
 
@@ -293,6 +294,7 @@ angular
           );
           $scope.errorMessage =
             "Login failed: " + (err.data.message || "Unknown error");
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
         });
     };
 
@@ -430,6 +432,36 @@ angular
       $scope.isCopying = false;
       $scope.removedSnippets = {};
       $scope.deletedSnippets = {};
+
+      // Auto-clear error messages after 3 seconds
+      $scope.autoHideErrors = function () {
+        if (
+          $scope.errorMessage ||
+          Object.values($scope.errors).some((error) => error)
+        ) {
+          $timeout(() => {
+            $scope.errorMessage = "";
+            $scope.errors = {
+              title: "",
+              code: "",
+              language: "",
+              tags: "",
+              category: "",
+            };
+            logToFile("Form errors auto-cleared after timeout", "DEBUG");
+          }, 3000); // 3 seconds delay
+        }
+      };
+
+      // Auto-clear success messages after 3 seconds
+      $scope.autoHideSuccess = function () {
+        if ($scope.successMessage) {
+          $timeout(() => {
+            $scope.successMessage = "";
+            logToFile("Success message auto-cleared after timeout", "DEBUG");
+          }, 3000); // 3 seconds delay
+        }
+      };
 
       // Add this function to provide better navigation feedback
       $scope.enhancedFormNavigation = function () {
@@ -642,6 +674,7 @@ angular
           $scope.errorMessage =
             "Please fix the errors above before submitting.";
           logToFile("Snippet validation failed", "WARN");
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
           return;
         }
 
@@ -670,9 +703,7 @@ angular
               `Snippet saved successfully: ${response.data._id}`,
               "SUCCESS"
             );
-            $timeout(() => {
-              $scope.successMessage = "";
-            }, 1000);
+            $scope.autoHideSuccess(); // Auto-hide success message after 3 seconds
           })
           .catch((err) => {
             logToFile(
@@ -687,6 +718,7 @@ angular
               $scope.errorMessage =
                 "Error saving snippet: " +
                 (err.data.message || "Unknown error");
+              $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
             }
           });
       };
@@ -696,9 +728,7 @@ angular
         if (snippet.verified && !$scope.isAdmin) {
           $scope.errorMessage = "You cannot edit a verified snippet.";
           logToFile("Edit attempt blocked - verified snippet", "WARN");
-          $timeout(() => {
-            $scope.errorMessage = "";
-          }, 2000);
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
           return;
         }
 
@@ -758,6 +788,7 @@ angular
           $scope.errorMessage =
             "Please fix the errors above before submitting.";
           logToFile("Snippet update validation failed", "WARN");
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
           return;
         }
 
@@ -793,9 +824,7 @@ angular
             highlightCode();
             $scope.successMessage = "Snippet updated successfully!";
             logToFile(`Snippet updated successfully: ${snippetId}`, "SUCCESS");
-            $timeout(() => {
-              $scope.successMessage = "";
-            }, 1000);
+            $scope.autoHideSuccess(); // Auto-hide success message after 3 seconds
           })
           .catch((err) => {
             logToFile(
@@ -810,6 +839,7 @@ angular
               $scope.errorMessage =
                 "Error updating snippet: " +
                 (err.data.message || "Unknown error");
+              $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
             }
           });
       };
@@ -817,7 +847,7 @@ angular
       $scope.deleteSnippet = function (snippetId) {
         logToFile(`Deleting snippet: ${snippetId}`, "INFO");
         $scope.deletedSnippets[snippetId] = true;
-        if (!$scope.$$phase) {
+        if (!$scope.$phase) {
           $scope.$apply();
         }
         $http
@@ -841,7 +871,7 @@ angular
                 `Snippet deleted successfully: ${snippetId}`,
                 "SUCCESS"
               );
-              if (!$scope.$$phase) {
+              if (!$scope.$phase) {
                 $scope.$apply();
               }
             }, 300);
@@ -857,7 +887,7 @@ angular
               $scope.isLoggedIn = false;
               $location.path("/login");
             }
-            if (!$scope.$$phase) {
+            if (!$scope.$phase) {
               $scope.$apply();
             }
           });
@@ -881,6 +911,7 @@ angular
           $scope.errorMessage = "Error copying code: Invalid snippet ID";
           $scope.isCopying = false;
           logToFile("Copy failed - invalid snippet", "ERROR");
+          $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
           return;
         }
 
@@ -896,13 +927,13 @@ angular
                 `Snippet copied successfully: ${snippet._id}`,
                 "SUCCESS"
               );
-              if (!$scope.$$phase) {
+              if (!$scope.$phase) {
                 $scope.$apply();
               }
               $timeout(() => {
                 $scope.copiedSnippets[snippet._id] = false;
                 $scope.isCopying = false;
-                if (!$scope.$$phase) {
+                if (!$scope.$phase) {
                   $scope.$apply();
                 }
               }, 300);
@@ -912,7 +943,8 @@ angular
               $scope.errorMessage =
                 "Error copying code: " + (err.message || "Unknown error");
               $scope.isCopying = false;
-              if (!$scope.$$phase) {
+              $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
+              if (!$scope.$phase) {
                 $scope.$apply();
               }
             });
@@ -929,13 +961,13 @@ angular
               `Snippet copied successfully (fallback): ${snippet._id}`,
               "SUCCESS"
             );
-            if (!$scope.$$phase) {
+            if (!$scope.$phase) {
               $scope.$apply();
             }
             $timeout(() => {
               $scope.copiedSnippets[snippet._id] = false;
               $scope.isCopying = false;
-              if (!$scope.$$phase) {
+              if (!$scope.$phase) {
                 $scope.$apply();
               }
             }, 1000);
@@ -944,7 +976,8 @@ angular
             $scope.errorMessage =
               "Error copying code: " + (err.message || "Unknown error");
             $scope.isCopying = false;
-            if (!$scope.$$phase) {
+            $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
+            if (!$scope.$phase) {
               $scope.$apply();
             }
           } finally {
@@ -964,9 +997,7 @@ angular
               `Snippet added to collection successfully: ${snippetId}`,
               "SUCCESS"
             );
-            $timeout(() => {
-              $scope.successMessage = "";
-            }, 1000);
+            $scope.autoHideSuccess(); // Auto-hide success message after 3 seconds
           })
           .catch((err) => {
             logToFile(
@@ -981,6 +1012,7 @@ angular
               $scope.errorMessage =
                 "Error adding to collection: " +
                 (err.data.message || "Unknown error");
+              $scope.autoHideErrors(); // Auto-hide errors after 3 seconds
             }
           });
       };
@@ -1023,7 +1055,7 @@ angular
         $scope.removedSnippets[snippetId] = true;
 
         // Force UI update
-        if (!$scope.$$phase) {
+        if (!$scope.$phase) {
           $scope.$apply();
         }
 
@@ -1058,13 +1090,11 @@ angular
                 "SUCCESS"
               );
 
-              // Clear success message after 2 seconds
-              $timeout(() => {
-                $scope.successMessage = "";
-              }, 2000);
+              // Auto-hide success message after 3 seconds
+              $scope.autoHideSuccess();
 
               // Force UI update
-              if (!$scope.$$phase) {
+              if (!$scope.$phase) {
                 $scope.$apply();
               }
             }, 300); // Small delay for visual feedback
@@ -1085,14 +1115,12 @@ angular
                 "Error removing from collection: " +
                 (err.data?.message || "Unknown error");
 
-              // Clear error message after 3 seconds
-              $timeout(() => {
-                $scope.errorMessage = "";
-              }, 3000);
+              // Auto-hide error message after 3 seconds
+              $scope.autoHideErrors();
             }
 
             // Force UI update
-            if (!$scope.$$phase) {
+            if (!$scope.$phase) {
               $scope.$apply();
             }
           });
