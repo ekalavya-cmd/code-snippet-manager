@@ -99,7 +99,7 @@ angular
       logToFile("Form errors cleared", "DEBUG");
     };
 
-    // Auto-clear error messages after 5 seconds
+    // Auto-clear error messages after 3 seconds
     $scope.autoHideErrors = function () {
       if (
         $scope.errorMessage ||
@@ -109,7 +109,7 @@ angular
           $scope.errorMessage = "";
           $scope.errors = { email: "", password: "", username: "" };
           logToFile("Form errors auto-cleared after timeout", "DEBUG");
-        }, 5000); // 5 seconds delay
+        }, 3000); // 3 seconds delay
       }
     };
 
