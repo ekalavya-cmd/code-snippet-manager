@@ -87,32 +87,26 @@ app.post("/register", async (req, res) => {
         email,
         username,
       });
-      return res
-        .status(400)
-        .json({
-          message:
-            "Both email and username are already registered. Please use different credentials.",
-        });
+      return res.status(400).json({
+        message:
+          "Both email and username are already registered. Please use different credentials.",
+      });
     }
 
     if (existingEmail) {
       console.log("Email already exists:", email);
-      return res
-        .status(400)
-        .json({
-          message:
-            "This email is already registered. Please use a different email or try logging in.",
-        });
+      return res.status(400).json({
+        message:
+          "This email is already registered. Please use a different email or try logging in.",
+      });
     }
 
     if (existingUsername) {
       console.log("Username already exists:", username);
-      return res
-        .status(400)
-        .json({
-          message:
-            "This username is already taken. Please choose a different username.",
-        });
+      return res.status(400).json({
+        message:
+          "This username is already taken. Please choose a different username.",
+      });
     }
 
     // Hash the password
@@ -289,12 +283,49 @@ app.get("/collection", authenticateToken, async (req, res) => {
   res.json(snippets);
 });
 
+// Replace the existing DELETE /collection/:snippetId endpoint in server/index.js with this:
+
 app.delete("/collection/:snippetId", authenticateToken, async (req, res) => {
-  await Collection.deleteOne({
-    userId: req.user.id,
-    snippetId: req.params.snippetId,
-  });
-  res.status(204).send();
+  try {
+    console.log(
+      `Removing snippet ${req.params.snippetId} from user ${req.user.id} collection`
+    );
+
+    const result = await Collection.deleteOne({
+      userId: req.user.id,
+      snippetId: req.params.snippetId,
+    });
+
+    console.log(`Delete result:`, result);
+
+    // Check if any document was actually deleted
+    if (result.deletedCount === 0) {
+      console.log(
+        `No collection entry found for snippet ${req.params.snippetId} and user ${req.user.id}`
+      );
+      return res.status(404).json({
+        message: "Snippet not found in your collection",
+        snippetId: req.params.snippetId,
+      });
+    }
+
+    console.log(
+      `Successfully removed snippet ${req.params.snippetId} from collection`
+    );
+
+    // Return success response with proper status code
+    res.status(200).json({
+      message: "Snippet removed from collection successfully",
+      snippetId: req.params.snippetId,
+      deletedCount: result.deletedCount,
+    });
+  } catch (err) {
+    console.error("Error removing from collection:", err);
+    res.status(500).json({
+      message: "Server error while removing from collection",
+      error: err.message,
+    });
+  }
 });
 
 app.get("/snippets/search", authenticateToken, async (req, res) => {

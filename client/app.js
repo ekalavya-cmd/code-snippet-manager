@@ -1052,17 +1052,25 @@ angular
 
       $scope.removeFromCollection = function (snippetId) {
         logToFile(`Removing snippet from collection: ${snippetId}`, "INFO");
+
+        // Show immediate visual feedback (same as delete button)
         $scope.removedSnippets[snippetId] = true;
 
-        // Force UI update
-        if (!$scope.$phase) {
+        // Force UI update immediately (same as delete button)
+        if (!$scope.$$phase) {
           $scope.$apply();
         }
 
         $http
           .delete(`http://localhost:3000/collection/${snippetId}`, getConfig())
-          .then(() => {
+          .then((response) => {
+            // Use same 300ms timeout delay as delete button
             $timeout(() => {
+              logToFile(
+                `Snippet removed from collection successfully: ${snippetId}`,
+                "SUCCESS"
+              );
+
               // Remove from collection arrays
               $scope.collectionSnippets = $scope.collectionSnippets.filter(
                 (s) => s._id !== snippetId
@@ -1075,35 +1083,37 @@ angular
               // Remove from collection ID set
               $scope.collectionSnippetIds.delete(snippetId);
 
-              // Re-run search to update filtered results
-              $scope.searchCollectionSnippets();
-
-              // Clear the removed state
-              $scope.removedSnippets[snippetId] = false;
+              // Re-run search to update filtered results if we're in collection view
+              if ($scope.showCollection) {
+                $scope.searchCollectionSnippets();
+              }
 
               // Apply syntax highlighting to remaining snippets
               highlightCode();
 
+              // Reset the removed state (same as delete button)
+              $scope.removedSnippets[snippetId] = false;
+
               $scope.successMessage = "Snippet removed from collection!";
-              logToFile(
-                `Snippet removed from collection successfully: ${snippetId}`,
-                "SUCCESS"
-              );
 
               // Auto-hide success message after 3 seconds
               $scope.autoHideSuccess();
 
-              // Force UI update
-              if (!$scope.$phase) {
+              // Force UI update if not in digest cycle (same as delete button)
+              if (!$scope.$$phase) {
                 $scope.$apply();
               }
-            }, 300); // Small delay for visual feedback
+            }, 300); // Same 300ms delay as delete button
           })
           .catch((err) => {
             logToFile(
-              `Failed to remove from collection: ${err.status} - ${err.data?.message}`,
+              `Failed to remove from collection: ${err.status} - ${
+                err.data?.message || "No error message"
+              }`,
               "ERROR"
             );
+
+            // Reset the button state on error (same as delete button)
             $scope.removedSnippets[snippetId] = false;
 
             if (err.status === 401 || err.status === 403) {
@@ -1111,16 +1121,28 @@ angular
               $scope.isLoggedIn = false;
               $location.path("/login");
             } else {
-              $scope.errorMessage =
-                "Error removing from collection: " +
-                (err.data?.message || "Unknown error");
+              // More detailed error message
+              const errorMsg =
+                err.data?.message ||
+                err.statusText ||
+                `HTTP ${err.status}` ||
+                "Network error";
+              $scope.errorMessage = `Error removing from collection: ${errorMsg}`;
+              logToFile(
+                `Detailed error info: Status=${
+                  err.status
+                }, Data=${JSON.stringify(err.data)}, StatusText=${
+                  err.statusText
+                }`,
+                "ERROR"
+              );
 
               // Auto-hide error message after 3 seconds
               $scope.autoHideErrors();
             }
 
-            // Force UI update
-            if (!$scope.$phase) {
+            // Force UI update if not in digest cycle (same as delete button)
+            if (!$scope.$$phase) {
               $scope.$apply();
             }
           });
