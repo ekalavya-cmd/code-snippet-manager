@@ -38,14 +38,17 @@ code-snippet-manager/
 ├── server/                         # Backend files
 │   ├── index.js                    # Main server file
 │   ├── package.json                # Server dependencies
+│   ├── node_modules/               # Server dependencies (not committed - in .gitignore)
 │   ├── .env                       # Environment variables (not committed - in .gitignore)
 │   └── models/                    # Database models
 │       ├── User.js                # User model
 │       ├── Snippet.js             # Snippet model
 │       ├── Collection.js          # Collection model
 │       └── Report.js              # Report model
+├── node_modules/                   # Dependencies (not committed - in .gitignore)
 ├── package.json                    # Root package file
-├── .gitignore                      # Git ignore rules (dependencies, env files, etc.)
+├── .gitignore                      # Git ignore rules (dependencies, env files, IDE configs, etc.)
+├── .claude/                        # Claude Code IDE settings (not committed - in .gitignore)
 ├── README.md                      # Project documentation
 └── .gitattributes                 # Git configuration
 ```
@@ -235,20 +238,38 @@ JWT_SECRET=your-secure-jwt-secret-here       # JWT signing secret
 
 ### Common Issues
 
-1. **Port Already in Use**
+1. **Cleaning Up Previously Committed Files**
+   If `node_modules/`, `.env`, or `.claude/` were previously committed to git, remove them:
+   ```bash
+   # Remove from git tracking (but keep locally)
+   git rm -r --cached node_modules
+   git rm -r --cached server/node_modules
+   git rm --cached server/.env
+   git rm -r --cached .claude
+
+   # Commit the removal
+   git commit -m "Remove ignored files from git tracking"
+
+   # Push the changes
+   git push
+   ```
+
+   > **Note**: These files/folders will remain on your local system but won't be tracked by git anymore. New clones won't include them, which is correct - users should run `npm install` to get dependencies.
+
+2. **Port Already in Use**
    - Server: Change `PORT` in `.env` file
    - Client: The `serve` command will automatically use the next available port
 
-2. **MongoDB Connection Failed**
+3. **MongoDB Connection Failed**
    - Ensure MongoDB is running locally
    - Check the `MONGO_URI` in your `.env` file
    - For MongoDB Atlas, verify your connection string and network access
 
-3. **Cannot Register Admin User**
+4. **Cannot Register Admin User**
    - Verify `ADMIN_EMAIL` in `.env` matches your registration email exactly
    - Check MongoDB connection and user creation logs
 
-4. **Syntax Highlighting Not Working**
+5. **Syntax Highlighting Not Working**
    - Ensure internet connection for CDN resources
    - Check browser console for Prism.js loading errors
 
