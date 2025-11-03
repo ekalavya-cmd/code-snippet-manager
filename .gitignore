@@ -124,3 +124,7 @@ public
 # Temporary folders
 tmp/
 temp/
+
+# Image uploads
+image*.png
+screenshot*.png
