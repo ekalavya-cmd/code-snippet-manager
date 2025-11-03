@@ -38,15 +38,14 @@ code-snippet-manager/
 ├── server/                         # Backend files
 │   ├── index.js                    # Main server file
 │   ├── package.json                # Server dependencies
-│   ├── package-lock.json          # Dependency lock file
-│   ├── .env                       # Environment variables
+│   ├── .env                       # Environment variables (not committed - in .gitignore)
 │   └── models/                    # Database models
 │       ├── User.js                # User model
 │       ├── Snippet.js             # Snippet model
 │       ├── Collection.js          # Collection model
 │       └── Report.js              # Report model
 ├── package.json                    # Root package file
-├── package-lock.json              # Root dependency lock
+├── .gitignore                      # Git ignore rules (dependencies, env files, etc.)
 ├── README.md                      # Project documentation
 └── .gitattributes                 # Git configuration
 ```
@@ -74,13 +73,15 @@ code-snippet-manager/
 
 3. **Configure environment variables**
    - Navigate to the `server` directory
-   - Update the `.env` file with your configuration:
+   - Create a `.env` file with your configuration:
    ```env
    PORT=3000
    MONGO_URI=mongodb://localhost:27017/snippetDB
    ADMIN_EMAIL=admin@csm.com
    JWT_SECRET=your-secure-jwt-secret-here
    ```
+
+   > **⚠️ Security Note**: The `.env` file contains sensitive information and should never be committed to version control. It is already included in `.gitignore` to prevent accidental commits.
 
 4. **Install server dependencies**
    ```bash
@@ -227,6 +228,8 @@ MONGO_URI=mongodb://localhost:27017/snippetDB  # MongoDB connection string
 ADMIN_EMAIL=admin@csm.com                    # Admin user email
 JWT_SECRET=your-secure-jwt-secret-here       # JWT signing secret
 ```
+
+> **Important**: The `.env` file is listed in `.gitignore` and will not be committed to your repository. This protects your sensitive configuration data.
 
 ## Troubleshooting
 
